@@ -1,11 +1,15 @@
 {
   "name": "dxsvelte",
-  "version": "0.0.2",
+  "version": "0.0.6",
   "description": "Bring the power of Svelte to your Django projects.",
-  "main": "router-build.js",
+  "main": "dxsvelte",
+  "bin": {
+    "dxsvelte": "node dist/dxsvelte-init.js",
+    "compile": "node dist/dxsvelte-compiler.js"
+  },
   "type": "module",
   "scripts": {
-    "start": "node ./dist/init.js",
+    "start": "node ./dist/dxsvelte-init.js",
     "compile": "node ./dist/dxsvelte-compiler.js",
     "build-dist": "ts-node ./src/build"
   },

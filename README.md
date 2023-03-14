@@ -28,7 +28,7 @@ DxSvelte is a powerful integration package that enables you to use Svelte as a f
 To get started with DxSvelte, initialise your Django project so it's ready to start building your SPA:
 
 ```sh
-npx dxsvelte init
+npx dxsvelte
 npm i
 ```
 You should now have a directory tree resembling the following:
