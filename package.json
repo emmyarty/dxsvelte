@@ -1,6 +1,6 @@
 {
   "name": "dxsvelte",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Bring the power of Svelte to your Django projects.",
   "main": "router-build.js",
   "type": "module",
