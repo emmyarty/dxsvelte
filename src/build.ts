@@ -12,6 +12,8 @@ try {
   console.info("Distribution folder already exists; continuing.");
 }
 
+const banner = { js: "#!/usr/bin/env node\n" };
+
 const external = [
   "require",
   "fs",
@@ -20,7 +22,7 @@ const external = [
   "url",
   "child_process",
   "svelte",
-]
+];
 
 await esbuild
   .build({
@@ -34,6 +36,7 @@ await esbuild
     format: "esm",
     plugins: [injectorPlugin()],
     external,
+    banner,
   })
   .catch(() => {
     console.error("Build failed for dxsvelte-init.js; exiting.");
@@ -52,6 +55,7 @@ await esbuild
     format: "esm",
     plugins: [injectorPlugin()],
     external,
+    banner,
   })
   .catch(() => {
     console.error("Build failed for dxsvelte-compiler.js; exiting.");

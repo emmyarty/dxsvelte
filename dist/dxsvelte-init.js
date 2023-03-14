@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var a=`from django.http import HttpResponse\r
 from django.conf import settings\r
 from django.urls import resolve\r

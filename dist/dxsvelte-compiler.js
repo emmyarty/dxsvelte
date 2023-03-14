@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var A=`#!/usr/bin/python3\r
 import os\r
 import sys\r
