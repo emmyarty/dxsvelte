@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/-Python-dd743f.svg)](#)
 [![TypeScript](https://img.shields.io/badge/-TypeScript-1f82df.svg)](#)
 
->⚠ **Warning**:
+>**Warning**:
 >This project is in early Alpha and key features are still under active development, including the passing of server side props.
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
