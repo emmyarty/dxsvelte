@@ -2,9 +2,10 @@
   "name": "{{__main}}",
   "type": "module",
   "scripts": {
-    "compile": "node ./node_modules/dxsvelte/dxsvelte-compiler.js"
+    "compile": "node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js"
   },
   "devDependencies": {
+    "dxsvelte": "*",
     "@types/node": "^18.14.6",
     "esbuild": "0.17.11",
     "esbuild-plugin-inline-import": "^1.0.1",

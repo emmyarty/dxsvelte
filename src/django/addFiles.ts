@@ -20,13 +20,18 @@ function getPath(file: string) {
 }
 
 function installConditional(fname: string, document: string, opts: Opts = {}) {
+  function printErr(fname: string){
+    console.error(`Could not install ${fname}. If the file already exists from a previous init, ignore this error.`);
+  }
   if (!isInstalled(fname)) {
     try {
       const configuredFile = injectOptionsIntoString(opts, document);
       writeFileSync(getPath(fname), configuredFile);
     } catch (err) {
-      console.error(`Couldn't install '${fname}'. If the file already exists from a previous init, ignore this error.`);
+      printErr(fname)
     }
+  } else {
+    printErr(fname)
   }
 }
 

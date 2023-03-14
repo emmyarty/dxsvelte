@@ -1,11 +1,10 @@
 {
   "name": "dxsvelte",
-  "version": "0.0.8",
+  "version": "0.0.12",
   "description": "Bring the power of Svelte to your Django projects.",
-  "main": "dxsvelte",
+  "main": "dist/dxsvelte-init.js",
   "bin": {
-    "dxsvelte": "node dist/dxsvelte-init.js",
-    "compile": "node dist/dxsvelte-compiler.js"
+    "dxsvelte": "./dist/dxsvelte-init.js"
   },
   "type": "module",
   "scripts": {
@@ -13,9 +12,12 @@
     "compile": "node ./dist/dxsvelte-compiler.js",
     "build-dist": "ts-node ./src/build"
   },
+  "engines": {
+    "node": ">=16.10.0"
+  },
   "author": "emmyarty",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "@types/node": "^18.14.6",
     "esbuild": "0.17.11",
     "esbuild-plugin-inline-import": "^1.0.1",
