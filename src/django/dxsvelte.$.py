@@ -5,7 +5,7 @@ from os.path import join, exists
 from subprocess import run
 import json
 
-svelte_ssr_js_path = join(settings.BASE_DIR, "{{app_name}}", "svelte.ssr.js")
+svelte_ssr_js_path = join(settings.BASE_DIR, "{{__main}}", "svelte.ssr.js")
 if exists(svelte_ssr_js_path):
     svelte_ssr_js_utf8 = open(svelte_ssr_js_path, "r").read()
 else:
@@ -18,7 +18,7 @@ else:
     svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title></head><body>{{app}}</body><script src='/static/bundle.js' defer></script></html>"""
 
 def svelte_ssr_html_wrap(app):
-    return svelte_ssr_html_utf8.replace("{{app}}", app, 1)
+    return svelte_ssr_html_utf8.replace("{{__main}}", app, 1)
 
 def _normalise_url(url):
     url = url.strip("/")
