@@ -1,0 +1,21 @@
+{
+  "name": "dxsvelte",
+  "version": "0.0.1",
+  "description": "Bring the power of Svelte to your Django projects.",
+  "main": "router-build.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ./dist/init.js",
+    "compile": "node ./dist/dxsvelte-compiler.js",
+    "build-dist": "ts-node ./src/build"
+  },
+  "author": "emmyarty",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^18.14.6",
+    "esbuild": "0.17.11",
+    "esbuild-plugin-inline-import": "^1.0.1",
+    "esbuild-svelte": "^0.7.3",
+    "svelte": "^3.56.0"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "{{__main}}",
+  "type": "module",
+  "scripts": {
+    "compile": "node ./node_modules/dxsvelte/dxsvelte-compiler.js"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.6",
+    "esbuild": "0.17.11",
+    "esbuild-plugin-inline-import": "^1.0.1",
+    "esbuild-svelte": "^0.7.3",
+    "svelte": "^3.56.0"
+  }
+}
