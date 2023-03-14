@@ -44,7 +44,7 @@ my_project_name
 ├── static
 │   ├── index.html
 │   ├── ...
-├── ...
+└── ...
 ```
 At this point, you can start building out your individual Django apps. To 'tag' them so that they are rolled up into the SPA, you need to assign names to your paths and prefix them with '$', like so:
 ```python
@@ -70,7 +70,7 @@ def about(req):
     return render(req)
 ```
 
-Finally, build out your view components, and optionally within your main app folder create your own **layout.svelte** file:
+Build out your view components, and optionally within your main app folder create your own **layout.svelte** file:
 ```
 my_project_name
 ├── manage.py
