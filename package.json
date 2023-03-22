@@ -1,6 +1,6 @@
 {
   "name": "dxsvelte",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Bring the power of Svelte to your Django projects.",
   "main": "dist/dxsvelte-init.js",
   "bin": {
@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node ./dist/dxsvelte-init.js",
     "compile": "node ./dist/dxsvelte-compiler.js",
-    "build-dist": "ts-node ./src/build"
+    "build-dist": "ts-node ./src/build",
+    "build-dist-and-update-playground": "ts-node ./src/build && node ./update-playground.js"
   },
   "engines": {
     "node": ">=16.10.0"

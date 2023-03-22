@@ -1,6 +1,7 @@
 import { join } from "path";
 import { Pattern, Resolver, Route } from "./routerTypes";
-import { __basedir } from "../settings/config";
+import { __basedir, __cache } from "../settings/config";
+import { writeFileSync } from "fs";
 
 function posixSlash(str: string | null) {
   if (!str) return str;
@@ -43,6 +44,9 @@ export function translateDjangoResolver(input: Resolver[]) {
         traverse({ ...data } as Resolver, item);
       });
     }
+    // We need to rework this massively. It's not enough to assume that every resolver marked to be included will be the child of an included view.
+    // Additionally, we've broken the home page!
+    // The fix to this will be to coerce the route as a 'Resolver' with a blank prefix. Resolvers (can) have Patterns, but Patterns don't have Resolvers.
     if (data.type === "pattern") {
       if (
         !parent ||
@@ -55,7 +59,7 @@ export function translateDjangoResolver(input: Resolver[]) {
         return null;
       const route = {
         app: parent.app_path,
-        path: constructPathFromSegments(parent.prefix, data.pattern),
+        path: (parent.prefix) ? constructPathFromSegments(parent.prefix, data.pattern) : constructPathFromSegments(data.pattern),
         view: data.name ?? null,
         component: data.name
           ? capitaliseTagName(parent.app_path) +
@@ -71,5 +75,6 @@ export function translateDjangoResolver(input: Resolver[]) {
   };
   if (!Array.isArray(input)) return router;
   input.map((item) => traverse(null, item));
+  writeFileSync(join(__cache, "debugRouter.json"), JSON.stringify(router, null, 2))
   return router;
 }

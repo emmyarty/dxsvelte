@@ -1,7 +1,6 @@
 import { readFileSync } from "fs";
 import type { Loader, Plugin, PluginBuild, StdinOptions } from "esbuild";
 import { resolve } from "path";
-import sveltePlugin from "esbuild-svelte";
 import { compile } from "svelte/compiler";
 import { CompileOptions } from "svelte/types/compiler";
 
@@ -9,17 +8,12 @@ export interface Opts {
   [key: string]: string;
 }
 
-interface SveltePlugin {
-  name: string;
-  setup: (build: PluginBuild) => {
-    transform: (input: string, filename: string) => Promise<{ code: string }>;
-  };
-}
-
 export function injectOptionsIntoString(opts: Opts, document: string): string {
   Object.keys(opts).forEach((key) => {
     const regexOpt = new RegExp(`{{${key}}}`, "g");
+    const regexOptOmit = new RegExp(`{{!${key}}}`, "g");
     document = document.replace(regexOpt, opts[key]);
+    document = document.replace(regexOptOmit, `{{${key}}}`);
   });
   return document;
 }

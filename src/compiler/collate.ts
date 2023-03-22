@@ -12,17 +12,17 @@ import entrypointCSR from "../svelte/templates/entrypoint-csr.$.js";
 //@ts-ignore
 import routerDefault from "../client/router.$.js";
 
-// Compiler Import
-import { compile } from "./compile";
+// Import the data script
+//@ts-ignore
+import dataDefault from "../client/data.$.js";
 
 // General Imports
 import type { Route } from "../resolver/routerTypes";
-import esbuild from "esbuild";
 import { StdinOptions } from "esbuild";
 import { existsSync } from "fs";
 import { injectOptionsIntoString } from "./injector";
 import { posixSlash } from "./utils";
-import { join, resolve } from "path";
+import { join } from "path";
 import {
   __basedir,
   __filename,
@@ -79,12 +79,20 @@ export function constructCompiler(router: Route[]) {
   const fnameRouter = posixSlash(join(__maindir, "router.vf.js"));
   const configuredRouter = injectOptionsIntoString(
     { router: strRouterArray },
-    // { router: '["/", "/sample/about", "/sample"]' },
     //@ts-ignore
     routerDefault
   );
   //@ts-ignore
   injectFile(fnameRouter, configuredRouter);
+
+  // Data Imports
+  const fnameData = posixSlash(join(__maindir, "data.vf.js"));
+  const configuredData = injectOptionsIntoString(
+    { fnameRouter },
+    dataDefault
+  );
+  //@ts-ignore
+  injectFile(fnameData, configuredData);
 
   const rootSvelte = injectOptionsIntoString(
     {
@@ -97,10 +105,7 @@ export function constructCompiler(router: Route[]) {
     rootDefaultSvelte
   );
 
-  // Create the Svelte App import strings for the entrypoint files
-  // const App = `${posixSlash(join(__cache, ))}`;
-
-  // Inject them into the files
+  // Create the Svelte App import strings for the entrypoint files and inject them into the files
   const configuredEntrypointSSR = injectOptionsIntoString(
     { App: fnameRoot },
     entrypointSSR

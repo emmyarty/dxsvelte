@@ -1,7 +1,8 @@
 node_modules
-src
 package-lock.json
 npm-debug.log
+update-playground.js
 .nyc
 .env
 .DS_Store
+src

@@ -1,19 +1,35 @@
-import esbuild from "esbuild";
+import esbuild, { Plugin } from "esbuild";
 import esbuildSvelte from "esbuild-svelte";
-import { join } from "path";
+import { join, resolve } from "path";
 import { CompileOptions } from "svelte/types/compiler";
 import { StdinOptions } from "esbuild";
 import { __maindir, __basedir } from "../settings/config";
 
 import { vfLoaderPlugin } from "./injector";
 import { mkdirSync } from "fs";
+import { posixSlash } from "./utils";
+
+const svelteDataStoreImportPath = posixSlash(join(__maindir, "data.vf.js"))
+
+function svelteDataResolver(): Plugin {
+  return {
+    name: 'svelte-data-resolver',
+    setup(build) {
+      build.onResolve({ filter: /^@data$/ }, (_) => {
+        return {
+          path: svelteDataStoreImportPath,
+        };
+      });
+    },
+  };
+}
 
 export function compile(
   entrypoint: string,
   vfLoaders: StdinOptions[],
   ver: "ssr" | "csr"
 ) {
-  console.log(ver, entrypoint)
+  console.log(ver, entrypoint);
   const compileOptionsCsr: CompileOptions = {
     generate: "dom",
     dev: false,
@@ -25,12 +41,12 @@ export function compile(
     hydratable: true,
     format: "esm",
   };
-  const compilerOptions = (ver === "ssr") ? compileOptionsSsr : compileOptionsCsr;
+  const compilerOptions = ver === "ssr" ? compileOptionsSsr : compileOptionsCsr;
   try {
     mkdirSync(join(__basedir, "static"));
   } catch (err) {}
   const outfile =
-    (ver === "ssr")
+    ver === "ssr"
       ? join(__maindir, "svelte.ssr.js")
       : join(__basedir, "static", "svelte.csr.js");
 
@@ -39,11 +55,11 @@ export function compile(
       entryPoints: [entrypoint],
       mainFields: ["svelte", "browser", "module", "main"],
       bundle: true,
-      //   outdir: "src",
       outfile,
       format: "esm",
       plugins: [
         vfLoaderPlugin(vfLoaders, compilerOptions),
+        svelteDataResolver(),
         esbuildSvelte({
           preprocess: [],
           compilerOptions,
@@ -52,7 +68,7 @@ export function compile(
     })
     .catch(() => {
       const msg =
-        (ver === "csr")
+        ver === "csr"
           ? "CSR Application Build Failed. Exiting."
           : "SSR Application Build Failed. Exiting.";
       console.error(msg);

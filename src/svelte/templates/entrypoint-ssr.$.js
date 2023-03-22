@@ -3,7 +3,23 @@ import App from '{{App}}';
 
 // Janky temporary workaround to avoid unneeded stdio outputs
 const SSRPATH = process.argv[2];
+const SSRJSON = process.argv[3];
 const __console = console;
+
+const currentRoute = SSRPATH ?? "/"
+
+let initialDataPayload = {}
+let initialDataPayloadScript = ''
+
+try {
+  const jsonString = decodeURIComponent(SSRJSON)
+  const jsonObject = JSON.parse(jsonString)
+  initialDataPayload[currentRoute] = jsonObject
+  initialDataPayloadScript = `<script>window.initialDataPayload = { route: \`${currentRoute}\`, data: JSON.parse(\`${jsonString}\`) };</script>`
+} catch (err) {
+  
+}
+
 console = new Proxy(
   {},
   {
@@ -15,11 +31,13 @@ console = new Proxy(
 
 // Mount and render the application
 const { head, html, css } = App.render({
-  currentRoute: SSRPATH ?? "/",
+  currentRoute
 });
 
+const htmlPreload = html + initialDataPayloadScript
+
 // Gather the application parts back into an object and serialise them into JSON
-const outputJSON = JSON.stringify({ head, html, css });
+const outputJSON = JSON.stringify({ head, html: htmlPreload, css });
 
 // Pipe the output into the console using the hijacked console
 __console.log(outputJSON);

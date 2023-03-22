@@ -24,5 +24,5 @@ const compilerConf = constructCompiler(router);
 await compile(compilerConf.entrypointCSRPath, compilerConf.vfLoaders, "csr");
 await compile(compilerConf.entrypointSSRPath, compilerConf.vfLoaders, "ssr");
 
-// Clean up the cache folder
-cleanSvCache();
+// Clean up the cache folder. Commented out for debugging, need to implement debug flags
+// cleanSvCache();
