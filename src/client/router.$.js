@@ -19,20 +19,19 @@ export const routes = JSON.parse(`{{router}}`);
 export const serverDataStore = {};
 
 class ServerDataStore {
-  constructor(
-    opts = { storePath: string, stale: true, data: {} }
-  ) {
-    this.storePath = opts.storePath;
+  constructor(storePath, stale = true, data = {}) {
+    this.storePath = storePath;
     // Currently no way of setting this
-    this.stale = opts.stale;
-    this.data = writable(opts.data);
+    this.stale = stale;
+    this.data = data;
+    // If the page was hydrated through SSR, then we can expect a global store to exist which we can import as the current state
     if (
       typeof window !== "undefined" &&
       typeof window === "object" &&
       window.mode !== "ssr" &&
       window.initialDataPayload?.route === currentPathStore
     ) {
-      this.data.set(window.initialDataPayload.data)
+      this.data = window.initialDataPayload.data
     }
   }
   async fetch() {
@@ -50,17 +49,18 @@ class ServerDataStore {
       const resultRaw = await fetch(loc, reqOptions);
       const resultJson = await resultRaw.json();
       result = resultJson
+      console.dir(result)
     } catch (err) {
       console.error('Server Request Failed - Contact Site Administrator.')
     }
     console.info('DXS GET Result: ', result)
-    this.data.set(result);
+    this.data = result;
   }
 }
 
 routes.map(
   (route) =>
-    (serverDataStore[route] = new ServerDataStore({ storePath: route }))
+    (serverDataStore[route] = new ServerDataStore(route))
 );
 
 async function refreshServerStore(store) {

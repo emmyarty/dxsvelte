@@ -1,6 +1,9 @@
 // Import compiled SSR Svelte app.
 import App from '{{App}}';
 
+// Import the data store
+// import { data } from "{{fnameData}}";
+
 // Janky temporary workaround to avoid unneeded stdio outputs
 const SSRPATH = process.argv[2];
 const SSRJSON = process.argv[3];
@@ -15,7 +18,11 @@ try {
   const jsonString = decodeURIComponent(SSRJSON)
   const jsonObject = JSON.parse(jsonString)
   initialDataPayload[currentRoute] = jsonObject
-  initialDataPayloadScript = `<script>window.initialDataPayload = { route: \`${currentRoute}\`, data: JSON.parse(\`${jsonString}\`) };</script>`
+  initialDataPayloadScript = `<script>
+  window.onload = function () {
+    window.initialDataPayload = { route: \`${currentRoute}\`, data: JSON.parse(\`${jsonString}\`) };
+  };
+  </script>`
 } catch (err) {
   
 }
