@@ -132,11 +132,11 @@ Meanwhile, in your **about.svelte** component over in the ./views directory:
 <script>
     // The import statement from @dxs below retrieves the server-side props 
 	import { data } from '@dxs'
-	let company = 'DxSvelte';
+	let company = 'DxSvelte'
     let incrementedValue = 0
 	const increment = () => {
 		incrementedValue ++
-	};
+	}
 </script>
 
 <h1>About {company}.</h1>
