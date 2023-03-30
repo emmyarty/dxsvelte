@@ -8,13 +8,11 @@ import entrypointSSR from "../svelte/templates/entrypoint-ssr.$.js";
 //@ts-ignore
 import entrypointCSR from "../svelte/templates/entrypoint-csr.$.js";
 
-// Import the router script
+// Import the router script and component linkers
 //@ts-ignore
-import routerDefault from "../client/router.$.js";
-
-// Import the data script
+import routerDefault from "../client/router.$.ts";
 //@ts-ignore
-import dataDefault from "../client/data.$.js";
+import linkerDefault from "../client/dxs.$.ts";
 
 // General Imports
 import type { Route } from "../resolver/routerTypes";
@@ -30,7 +28,6 @@ import {
   __cache,
   __main,
   __maindir,
-  cache,
 } from "../settings/config";
 
 // Construct the compiler data
@@ -38,25 +35,21 @@ export function constructCompiler(router: Route[]) {
   const vfLoaders: StdinOptions[] = [];
 
   function injectFile(sourcefile: string, contents: string) {
-    // const sourcefileParts = sourcefile.match(/\.(.+)$/);
     const loaderParts = sourcefile.split(".");
     const loader = loaderParts[loaderParts.length - 1];
-    // sourcefileParts && Array.isArray(sourcefileParts) ? sourcefileParts[sourcefileParts.length - 1] : "js";
     const vfLoader = {
       contents,
       sourcefile,
       loader,
     };
-    //@ts-ignore
-    vfLoaders.push(vfLoader);
+    vfLoaders.push(vfLoader as StdinOptions);
   }
 
   // Construct the Layout import line; if the user's one doesn't exist, import the virtual one and change the fname
   let fnameLayout = posixSlash(join(__maindir, "layout.svelte"));
   if (!existsSync(fnameLayout)) {
     fnameLayout = posixSlash(join(__maindir, "layout.vf.svelte"));
-    //@ts-ignore
-    injectFile(fnameLayout, layoutDefaultSvelte);
+    injectFile(fnameLayout, layoutDefaultSvelte as unknown as string);
   }
 
   // Construct the Root component from the resolved router data
@@ -76,23 +69,12 @@ export function constructCompiler(router: Route[]) {
 
   // Router Imports
   const strRouterArray = JSON.stringify(router.map((route) => route.path));
-  const fnameRouter = posixSlash(join(__maindir, "router.vf.js"));
+  const fnameRouter = posixSlash(join(__maindir, "router.vf.ts"));
   const configuredRouter = injectOptionsIntoString(
     { router: strRouterArray },
-    //@ts-ignore
     routerDefault
   );
-  //@ts-ignore
   injectFile(fnameRouter, configuredRouter);
-
-  // Data Imports
-  const fnameData = posixSlash(join(__maindir, "data.vf.js"));
-  const configuredData = injectOptionsIntoString(
-    { fnameRouter },
-    dataDefault
-  );
-  //@ts-ignore
-  injectFile(fnameData, configuredData);
 
   const rootSvelte = injectOptionsIntoString(
     {
@@ -101,9 +83,21 @@ export function constructCompiler(router: Route[]) {
       svelteComponentImports,
       svelteComponentsIfs,
     },
-    //@ts-ignore
-    rootDefaultSvelte
+    rootDefaultSvelte as unknown as string
   );
+
+  // Inject a local .vf.ts for each route component
+  const routeLinker = (route: Route) => {
+    const conf = {
+      path: route.path,
+      fnameRouter,
+    };
+    const linkerLocalised = injectOptionsIntoString(conf, linkerDefault);
+    const fname = `${route.filename}.dxs.vf.ts`;
+    injectFile(fname, linkerLocalised);
+  };
+
+  router.map((route) => routeLinker(route));
 
   // Create the Svelte App import strings for the entrypoint files and inject them into the files
   const configuredEntrypointSSR = injectOptionsIntoString(
@@ -119,13 +113,8 @@ export function constructCompiler(router: Route[]) {
   const entrypointSSRPath = `${posixSlash(join(__cache, "ssr.vf.js"))}`;
   const entrypointCSRPath = `${posixSlash(join(__cache, "csr.vf.js"))}`;
 
-  //@ts-ignore
   injectFile(fnameRoot, rootSvelte);
-
-  //@ts-ignore
   injectFile(entrypointSSRPath, configuredEntrypointSSR);
-
-  //@ts-ignore
   injectFile(entrypointCSRPath, configuredEntrypointCSR);
 
   return {

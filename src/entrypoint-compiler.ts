@@ -20,9 +20,12 @@ prepareSvCache();
 const router = getRouter();
 const compilerConf = constructCompiler(router);
 
+// Debug output
+console.dir(router)
+
 // Compile the user's application
 await compile(compilerConf.entrypointCSRPath, compilerConf.vfLoaders, "csr");
 await compile(compilerConf.entrypointSSRPath, compilerConf.vfLoaders, "ssr");
 
-// Clean up the cache folder. Commented out for debugging, need to implement debug flags
-// cleanSvCache();
+// Clean up the cache folder. Sometimes commented out for debugging, need to implement debug flags
+cleanSvCache();

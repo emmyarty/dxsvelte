@@ -9,15 +9,17 @@ import { vfLoaderPlugin } from "./injector";
 import { mkdirSync } from "fs";
 import { posixSlash } from "./utils";
 
-const svelteDataStoreImportPath = posixSlash(join(__maindir, "data.vf.js"))
-
+// This is where we 'redirect' @dxs import to the local *.dxs.ts file.
 function svelteDataResolver(): Plugin {
   return {
     name: 'svelte-data-resolver',
     setup(build) {
-      build.onResolve({ filter: /^@data$/ }, (_) => {
+      build.onResolve({ filter: /^@dxs$/ }, (args) => {
+        const original = posixSlash(args.importer)
+        const path = `${original}.dxs.vf.ts`
+        console.log('Virtual @dxs: ', path)
         return {
-          path: svelteDataStoreImportPath,
+          path
         };
       });
     },

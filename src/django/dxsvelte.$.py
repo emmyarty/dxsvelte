@@ -19,7 +19,7 @@ svelte_ssr_html_path = join(settings.BASE_DIR, "static", "index.html")
 if exists(svelte_ssr_html_path):
     svelte_ssr_html_utf8 = open(svelte_ssr_html_path, "r").read()
 else:
-    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title></head><body>{{!app}}</body><script src='/static/bundle.js' defer></script></html>"""
+    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title></head><body>{{app}}</body>{{spa}}<script src='/static/svelte.csr.js' defer></script></html>"""
 
 def abs_path(*paths):
     joined_path = '/'.join(paths)
@@ -31,10 +31,8 @@ def abs_path(*paths):
     final_path = final_path.rstrip('/')
     return final_path
 
-_spa = f"<script src='{abs_path(settings.STATIC_URL, '/svelte.csr.js')}' defer></script>"
-
 def svelte_ssr_html_wrap(app):
-    return svelte_ssr_html_utf8.replace("{{__main}}", app, 1)
+    return svelte_ssr_html_utf8.replace("{{app}}", app, 1)
 
 def _normalise_url(url):
     url = url.strip("/")
@@ -62,6 +60,6 @@ def render(request, data = {}):
         data_json = json.dumps(data)
         return HttpResponse(data_json, content_type="application/json")
     req_path = _normalise_url(resolve(request.path_info).route)
-    rendered_output = _render(req_path)
+    rendered_output = _render(req_path, data)
     interpolated_output = svelte_ssr_html_wrap(rendered_output)
     return HttpResponse(interpolated_output, content_type="text/html")

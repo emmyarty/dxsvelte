@@ -2,6 +2,7 @@
   "name": "{{__main}}",
   "type": "module",
   "scripts": {
+    "refresh": "node ./node_modules/dxsvelte/dist/dxsvelte-init.js",
     "compile": "node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js"
   },
   "devDependencies": {
@@ -10,6 +11,6 @@
     "esbuild": "0.17.11",
     "esbuild-plugin-inline-import": "^1.0.1",
     "esbuild-svelte": "^0.7.3",
-    "svelte": "^3.56.0"
+    "svelte": "^3.57.0"
   }
 }

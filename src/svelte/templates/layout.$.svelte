@@ -1,1 +1,1 @@
-<body><slot/></body>
+<slot/>

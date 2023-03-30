@@ -41,7 +41,6 @@ function isolateLoader(
   loaders: StdinOptions[]
 ): StdinOptions | null {
   const resolvedRequest = resolve(requested);
-  // console.log(resolvedRequest);
   return (
     loaders.find((item) => resolve(item.sourcefile!) === resolvedRequest) ??
     null
@@ -57,10 +56,7 @@ export function vfLoaderPlugin(loaders: StdinOptions[] = [], compileOptions: Com
         return { path: args.path };
       });
       build.onLoad({ filter: /\.vf\.[\S]+$/ }, async (args) => {
-        // console.log("VF Loaded: " + args.path);
         const currentDocument = isolateLoader(args.path, loaders);
-        // console.log("VF Matched:");
-        // console.dir(currentDocument);
         const contents = currentDocument!.contents;
         const loader = currentDocument!.loader as Loader;
 

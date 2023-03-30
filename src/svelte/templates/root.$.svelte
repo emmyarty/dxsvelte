@@ -1,10 +1,10 @@
 <script>
-  // import { currentPathStore, goto } from '@harika/router'
-  // import Layout from '../{{__main}}/layout.svelte'
-  import { currentPathStore } from "{{router}}";
+  import { currentPathStore, ssrHydrate } from "{{router}}";
   {{layoutImportStatement}};
   {{svelteComponentImports}};
   export let currentRoute;
+  export let ssrData = {};
+  ssrHydrate(currentRoute, ssrData)
   currentPathStore.set(currentRoute);
   currentPathStore.subscribe((value) => {
     if (currentRoute !== value) {
