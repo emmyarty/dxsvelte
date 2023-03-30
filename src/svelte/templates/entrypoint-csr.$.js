@@ -9,10 +9,16 @@ function clPath (str) {
   return str
 }
 
+// Create a new DOM node
+const container = document.createElement('body');
+
 // Mount the application.
 new App({
-    target: document.body,
+    target: container,
     props: {
       currentRoute: clPath(window.location.pathname)
     }
 })
+
+// Replace the current document.body with the new DOM node hosting the app
+document.body.replaceWith(container);

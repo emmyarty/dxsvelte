@@ -154,13 +154,19 @@ function clPath (str) {\r
   return str\r
 }\r
 \r
+// Create a new DOM node\r
+const container = document.createElement('body');\r
+\r
 // Mount the application.\r
 new App({\r
-    target: document.body,\r
+    target: container,\r
     props: {\r
       currentRoute: clPath(window.location.pathname)\r
     }\r
-})`;var se=`import { Writable, writable } from "svelte/store";\r
+})\r
+\r
+// Replace the current document.body with the new DOM node hosting the app\r
+document.body.replaceWith(container);`;var se=`import { Writable, writable } from "svelte/store";\r
 \r
 declare global {\r
   interface Window {\r

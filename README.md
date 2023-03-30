@@ -14,8 +14,11 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
-## New in 0.0.16!
-- **Passing Props:** SSR now comes with a mini payload containing the requested page's properties. This gets pulled into the data stores during initialisation instead of being requested for a second time immediately after loading in the browser. Scroll down to see how it works.
+## Bug Fix Release 0.0.17
+- **App Duplication:** Addressed a silly error which would cause the app to be mounted after, rather than over, the SSR content.
+
+## Milestone Release 0.0.16
+- **Django Dict -> Svelte Data Passing:** SSR now comes with a mini payload containing the requested page's props. This gets pulled into the data stores during initialisation instead of being requested for a second time immediately after loading in the browser. Scroll down to see how it works.
 - **Partial Refactor:** A lot of the code under the hood has been changed and minor bugs stamped out. It's for the best.
 
 ## Features

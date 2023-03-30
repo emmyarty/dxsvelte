@@ -6,3 +6,4 @@ update-playground.js
 .env
 .DS_Store
 src
+meta
