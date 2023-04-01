@@ -26,15 +26,6 @@ export const activeViewStore = writable({
 // The path as the key and the component is the value. This will be interpolated with a JSON representation of the routes.
 export const routes = JSON.parse(`{{router}}`) as string[];
 
-// We need to create a series of functions which will evaluate paths against the router as well as reconstruct them from the patterns.
-function pathConstructor() {
-
-}
-
-function pathMatcher() {
-
-}
-
 class ServerDataStore {
   storePath: string;
   data: Writable<any>;
@@ -87,14 +78,6 @@ class ServerDataStore {
     }
     const patternPath = /^<path:\w+>$/
     const patternGeneral = /^<\w+:\w+>$/;
-    type DjangoParamTypes = 'str'|'int'|'slug'|'uuid'|'path';
-    interface DjangoParams {
-      str: string
-      int: number
-      slug: string
-      uuid: string
-      path: string
-    }
     const passedSegments = trim(urlPath).split("/");
     const referencedSegments = trim(this.storePath).split("/"); 
     
@@ -179,7 +162,6 @@ export const goto = (href: string) => {
       route: validPath,
       href: thisPath
     });
-    // activeViewStore.update(value => value)
   };
 };
 
