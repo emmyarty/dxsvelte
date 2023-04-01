@@ -14,6 +14,10 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
+## Patch 0.0.19
+- **Default HTML CSS:** It now includes a reference to the CSS build artefacts in the built-in HTML template string - it's still recommended that you bring your own HTML template, however.
+- **Redundant Code Generation:** DxSvelte.py is now a static script with no generated content, it is only inserted by the installer.
+
 ## Milestone Release 0.0.18
 - **Route Parameters:** You can now use your **\<str:something\>** values in DxSvelte routes - they work. Use them to customise your server-side props, and build out your individual views as before.
 - **CSS Generation:** CSS now builds successfully where included in the style tags, but be warned that PostCSS will still not work. For now the mixture of component styling & pre-built stylesheets has pushed the outstanding down the priority queue for now, but it is still on the list.

@@ -11,7 +11,9 @@ import json\r
 # Currently unused, on the to-do list\r
 from django.middleware import csrf\r
 \r
-svelte_ssr_js_path = join(settings.BASE_DIR, "{{__main}}", "svelte.ssr.js")\r
+project = settings.ROOT_URLCONF.split('.')[0]\r
+\r
+svelte_ssr_js_path = join(settings.BASE_DIR, project, "svelte.ssr.js")\r
 if exists(svelte_ssr_js_path):\r
     svelte_ssr_js_utf8 = open(svelte_ssr_js_path, "r").read()\r
 else:\r
@@ -21,7 +23,7 @@ svelte_ssr_html_path = join(settings.BASE_DIR, "static", "index.html")\r
 if exists(svelte_ssr_html_path):\r
     svelte_ssr_html_utf8 = open(svelte_ssr_html_path, "r").read()\r
 else:\r
-    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title></head><body>{{app}}</body>{{spa}}<script src='/static/svelte.csr.js' defer></script></html>"""\r
+    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="/static/svelte.csr.css"></head><body>{{app}}</body><script src='/static/svelte.csr.js' defer></script></html>"""\r
 \r
 def abs_path(*paths):\r
     joined_path = '/'.join(paths)\r
@@ -110,6 +112,6 @@ def render(request, data = {}):\r
   },\r
   "types": ["node"]\r
 }\r
-`;import{existsSync as y,writeFileSync as E}from"fs";import{existsSync as g,mkdirSync as T,readdirSync as D,readFileSync as x,rmSync as I,unlinkSync as L}from"fs";import{join as l,resolve as v}from"path";import*as a from"url";var j="__svcache__";var n=v(process.cwd()),$=a.fileURLToPath(import.meta.url),M=a.fileURLToPath(new URL(".",import.meta.url)),A=l(n,j),S=g(l(n,"manage.py"));S||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${n} is a Django project directory. Continuing.`);var k=m(),i=m(),J=l(n,i);function m(){let t=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,r=x(l(n,"manage.py"),"utf8").match(t)??[],o=r?.length>3?r[3]:"";if(o==="")throw new Error("Could not extract settings from manage.py. Exiting.");return o.split(".")[0]}import{readFileSync as N}from"fs";import{resolve as H}from"path";import{compile as V}from"svelte/compiler";function f(t,e){return Object.keys(t).forEach(r=>{let o=new RegExp(`{{${r}}}`,"g"),s=new RegExp(`{{!${r}}}`,"g");e=e.replace(o,t[r]),e=e.replace(s,`{{${r}}}`)}),e}import{join as _}from"path";function O(t){let e=_(n,t);return y(e)}function w(t){return _(n,t)}function p(t,e,r={}){function o(s){console.error(`Could not install ${s}. If the file already exists from a previous init, ignore this error.`)}if(O(t))o(t);else try{let s=f(r,e);E(w(t),s)}catch{o(t)}}function h(){p("dxsvelte.py",c,{__main:i}),p("package.json",d,{__main:i}),p("tsconfig.json",u,{__main:i})}h();console.log(`DxSvelte initialisation completed. Remember to run npm i in order to install local dependencies and
+`;import{existsSync as y,writeFileSync as O}from"fs";import{existsSync as g,mkdirSync as L,readdirSync as P,readFileSync as v,rmSync as D,unlinkSync as I}from"fs";import{join as i,resolve as x}from"path";import*as a from"url";var j="__svcache__";var n=x(process.cwd()),$=a.fileURLToPath(import.meta.url),M=a.fileURLToPath(new URL(".",import.meta.url)),k=i(n,j),S=g(i(n,"manage.py"));S||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${n} is a Django project directory. Continuing.`);var A=m(),l=m(),U=i(n,l);function m(){let t=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,r=v(i(n,"manage.py"),"utf8").match(t)??[],o=r?.length>3?r[3]:"";if(o==="")throw new Error("Could not extract settings from manage.py. Exiting.");return o.split(".")[0]}import{readFileSync as G}from"fs";import{resolve as H}from"path";import{compile as V}from"svelte/compiler";function f(t,e){return Object.keys(t).forEach(r=>{let o=new RegExp(`{{${r}}}`,"g"),s=new RegExp(`{{!${r}}}`,"g");e=e.replace(o,t[r]),e=e.replace(s,`{{${r}}}`)}),e}import{join as _}from"path";function E(t){let e=_(n,t);return y(e)}function w(t){return _(n,t)}function p(t,e,r={}){function o(s){console.error(`Could not install ${s}. If the file already exists from a previous init, ignore this error.`)}if(E(t))o(t);else try{let s=f(r,e);O(w(t),s)}catch{o(t)}}function h(){p("dxsvelte.py",c),p("package.json",d,{__main:l}),p("tsconfig.json",u,{__main:l})}h();console.log(`DxSvelte initialisation completed. Remember to run npm i in order to install local dependencies and
 update your .gitignore to exclude node_modules`);
 //# sourceMappingURL=dxsvelte-init.js.map

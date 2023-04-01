@@ -9,7 +9,9 @@ import json
 # Currently unused, on the to-do list
 from django.middleware import csrf
 
-svelte_ssr_js_path = join(settings.BASE_DIR, "{{__main}}", "svelte.ssr.js")
+project = settings.ROOT_URLCONF.split('.')[0]
+
+svelte_ssr_js_path = join(settings.BASE_DIR, project, "svelte.ssr.js")
 if exists(svelte_ssr_js_path):
     svelte_ssr_js_utf8 = open(svelte_ssr_js_path, "r").read()
 else:
