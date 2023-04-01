@@ -4,9 +4,12 @@ import App from '{{App}}';
 // Janky temporary workaround to avoid unneeded stdio outputs
 const SSRPATH = process.argv[2];
 const SSRJSON = process.argv[3];
+
+// const writer = process.stdout.write
+// process.stdout.write = () => null
 const __console = console;
 
-const currentRoute = SSRPATH ?? "/"
+const currentView = SSRPATH ?? "/"
 
 let initialDataPayload = {}
 let initialDataPayloadScript = ''
@@ -16,9 +19,9 @@ let jsonObject = {}
 try {
   jsonString = decodeURIComponent(SSRJSON)
   jsonObject = JSON.parse(jsonString)
-  initialDataPayload[currentRoute] = jsonObject
+  initialDataPayload[currentView] = jsonObject
   initialDataPayloadScript = `<script>
-  window.initialDataPayload = { route: \`${currentRoute}\`, data: JSON.parse(\`${jsonString}\`) }
+  window.initialDataPayload = { route: \`${currentView}\`, data: JSON.parse(\`${jsonString}\`) }
   </script>`
 } catch (err) {
   
@@ -35,7 +38,7 @@ console = new Proxy(
 
 // Mount and render the application
 const { head, html, css } = App.render({
-  currentRoute,
+  currentView,
   ssrData: jsonObject
 });
 

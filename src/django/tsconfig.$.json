@@ -12,7 +12,10 @@
     "module": "ES2022",
     "moduleResolution": "node",
     "noEmit": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@{{__main}}/*": ["{{__main}}/*"]
+    }
   },
   "ts-node": {
     "esm": true,

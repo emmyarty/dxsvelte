@@ -1,6 +1,6 @@
 {
   "name": "dxsvelte",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Bring the power of Svelte to your Django projects.",
   "main": "dist/dxsvelte-init.js",
   "bin": {
@@ -22,8 +22,10 @@
     "@types/node": "^18.14.6",
     "esbuild": "0.17.11",
     "esbuild-plugin-inline-import": "^1.0.1",
+    "esbuild-plugin-postcss": "^0.1.4",
     "esbuild-svelte": "^0.7.3",
-    "svelte": "^3.56.0"
+    "svelte": "^3.56.0",
+    "svelte-preprocess": "^5.0.3"
   },
   "keywords": [
     "svelte",

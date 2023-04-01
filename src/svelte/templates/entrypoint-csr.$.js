@@ -16,7 +16,7 @@ const container = document.createElement('body');
 new App({
     target: container,
     props: {
-      currentRoute: clPath(window.location.pathname)
+      currentView: clPath(window.location.pathname)
     }
 })
 

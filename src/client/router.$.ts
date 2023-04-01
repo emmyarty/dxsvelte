@@ -18,10 +18,22 @@ function onlyPath(path: string) {
   return path;
 }
 
-export const currentPathStore = writable("/");
+export const activeViewStore = writable({
+  route: "/",
+  href: "/"
+});
 
 // The path as the key and the component is the value. This will be interpolated with a JSON representation of the routes.
 export const routes = JSON.parse(`{{router}}`) as string[];
+
+// We need to create a series of functions which will evaluate paths against the router as well as reconstruct them from the patterns.
+function pathConstructor() {
+
+}
+
+function pathMatcher() {
+
+}
 
 class ServerDataStore {
   storePath: string;
@@ -46,14 +58,16 @@ class ServerDataStore {
     }
     this.data = writable(getInitialPayload());
   }
-  async fetch() {
+  async fetch(target:string|null = null) {
     try {
+      const trimmedTarget = onlyPath(target ?? this.storePath)
+      const validatedTarget = (this.satisfiedBy(trimmedTarget)) ? trimmedTarget : this.storePath
       const { protocol, hostname, port } = window.location;
       const portDefault = protocol === "https:" ? "443" : "80";
       const hostnameQualified = `${hostname}${
         port && port !== portDefault ? ":" + port : ""
       }`;
-      const loc = `${protocol}//${hostnameQualified}${this.storePath}`;
+      const loc = `${protocol}//${hostnameQualified}${validatedTarget}`;
       // Note: CSRF?
       const reqOptions = {
         method: "DXS",
@@ -67,6 +81,53 @@ class ServerDataStore {
       console.error("Server Request Failed - Contact Site Administrator.");
     }
   }
+  satisfiedBy(urlPath: string) {
+    function trim(str: string) {
+      return str.replace(/^\/+|\/+$/g, '');
+    }
+    const patternPath = /^<path:\w+>$/
+    const patternGeneral = /^<\w+:\w+>$/;
+    type DjangoParamTypes = 'str'|'int'|'slug'|'uuid'|'path';
+    interface DjangoParams {
+      str: string
+      int: number
+      slug: string
+      uuid: string
+      path: string
+    }
+    const passedSegments = trim(urlPath).split("/");
+    const referencedSegments = trim(this.storePath).split("/"); 
+    
+    // Handle blanks and return the result immediately
+    if (referencedSegments.length === 1 && referencedSegments[0] === "") return (passedSegments.length === 1 && passedSegments[0] === "")
+    
+    // Initialise the cumulative result
+    let result = true
+    referencedSegments.map((segment, index) => {
+      switch(true) {
+        // if it's not a match, just exit to avoid unnecessary checks
+        case (result === false):
+          break
+        // if the passed segment doesn't even contain one with this index number, fail
+        case (typeof passedSegments[index] === 'undefined'):
+          result = false
+          break
+        // if the segments are not a verbatim match AND not a normal (non-path) reference segment, fail
+        case (segment !== passedSegments[index] && !patternGeneral.test(segment)):
+          result = false
+          break
+        // if the segment is a path but this isn't the last segment, fail
+        case (patternPath.test(segment) && index < referencedSegments.length - 1):
+          result = false
+          break
+        // if this is the last segment in the reference but the passed one continues and this isn't a path, fail
+        case (index === referencedSegments.length - 1 && passedSegments.length > referencedSegments.length && !patternPath.test(segment)):
+          result = false
+          break
+      }
+    })    
+    return result
+  }
 }
 
 interface ServerDataStoreType {
@@ -74,6 +135,18 @@ interface ServerDataStoreType {
 }
 
 export const serverDataStore: ServerDataStoreType = {};
+
+export function satisfiedStorePath(targetStorePath: string) {
+  const fetchedStore = Object.values(serverDataStore).find(dataStore => dataStore.satisfiedBy(targetStorePath))
+  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object') return null
+  return fetchedStore.storePath
+}
+
+export function getComponentFromTargetPath(targetStorePath: string) {
+  const fetchedStore = Object.values(serverDataStore).find(dataStore => dataStore.satisfiedBy(targetStorePath))
+  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object') return null
+  return fetchedStore.storePath
+}
 
 export function ssrHydrate(thisPath: string, payload: any) {
   if (typeof process !== "undefined" && serverDataStore && serverDataStore[thisPath]) {
@@ -85,23 +158,28 @@ routes.map((route) => {
   serverDataStore[route] = new ServerDataStore(route)
 });
 
-function refreshServerStore(store: string) {
-  if (!serverDataStore[store] ?? serverDataStore[store].stale === false)
-    return null;
-  return serverDataStore[store].fetch();
+function refreshServerStore(targetStorePath: string) {
+  const fetchedStore = Object.values(serverDataStore).find(dataStore => dataStore.satisfiedBy(targetStorePath))
+  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object') return null
+  return fetchedStore.fetch(targetStorePath);
 }
 
 export const goto = (href: string) => {
   return async () => {
     const thisPath = onlyPath(href);
     // Guard clause to navigate to destinations not within the scope of the SPA router
-    if (!routes.some((route) => thisPath === route)) {
-      return (window.location.href = href);
+    const validPath = satisfiedStorePath(thisPath)
+    if (!validPath) {
+      return (window.location.href = href)
     }
     // Push the href into the history stack and update the stored location
     await refreshServerStore(thisPath);
     window.history.pushState({}, "", href);
-    currentPathStore.set(thisPath);
+    activeViewStore.set({
+      route: validPath,
+      href: thisPath
+    });
+    // activeViewStore.update(value => value)
   };
 };
 
@@ -112,7 +190,6 @@ if (
 ) {
   // Clean the temporary payload from the DOM
   Array.from(document.getElementsByTagName('script')).forEach(script => (script.innerHTML.includes('window.initialDataPayload')) && script.remove())
-  console.log(routes);
   function hrefHandle(e: MouseEvent) {
     if (
       e?.target &&
@@ -145,12 +222,7 @@ if (
   });
 }
 
+// data alias used only for SSR
 export const data = writable({});
-
-currentPathStore.subscribe((currentPath) => {
-  if (typeof serverDataStore[currentPath] !== 'object') return null
-  console.log('Updating Data Store: ', currentPath)
-  data.set(serverDataStore[currentPath].data);
-});
 
 export default { goto, routes, serverDataStore, data, ssrHydrate };

@@ -22,6 +22,11 @@ const external = [
   "url",
   "child_process",
   "svelte",
+  "esbuild-plugin-postcss",
+  "esbuild-svelte",
+  "svelte-preprocess",
+  "esbuild-plugin-postcss",
+  "esbuild-plugin-inline-import"
 ];
 
 await esbuild

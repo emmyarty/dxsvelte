@@ -59,7 +59,11 @@ export function constructCompiler(router: Route[]) {
   const routeImports = (route: Route) =>
     `import ${route.component} from '${route.filename}'`;
   const routeIfs = (route: Route) =>
-    `{#if currentRoute === '${route.path}'}<${route.component}></${route.component}>{/if}`;
+    `{#each trigger as instance}{#if satisfiedStorePath(currentView) === '${route.path}'}<${route.component}></${route.component}>{/if}{/each}`;
+  
+  // const svelteComponentMap = () => {
+  //   const body = router.map(route => `["${route.path}"]: ${route.component}`)
+  // } 
 
   const svelteComponentImportsArr = router.map((route) => routeImports(route));
   const svelteComponentsIfsArr = router.map((route) => routeIfs(route));

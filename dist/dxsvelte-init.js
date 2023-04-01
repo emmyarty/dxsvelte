@@ -73,12 +73,17 @@ def render(request, data = {}):\r
     "compile": "node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js"
   },
   "devDependencies": {
-    "dxsvelte": "*",
+  "dxsvelte": "*",
     "@types/node": "^18.14.6",
+    "autoprefixer": "^10.4.14",
     "esbuild": "0.17.11",
     "esbuild-plugin-inline-import": "^1.0.1",
+    "esbuild-plugin-postcss": "^0.1.4",
     "esbuild-svelte": "^0.7.3",
-    "svelte": "^3.57.0"
+    "postcss": "^8.4.21",
+    "svelte": "^3.57.0",
+    "tailwindcss": "^3.3.0",
+    "svelte-preprocess": "^5.0.3"
   }
 }`;var u=`{\r
   "compilerOptions": {\r
@@ -94,7 +99,10 @@ def render(request, data = {}):\r
     "module": "ES2022",\r
     "moduleResolution": "node",\r
     "noEmit": true,\r
-    "baseUrl": "."\r
+    "baseUrl": ".",\r
+    "paths": {\r
+      "@{{__main}}/*": ["{{__main}}/*"]\r
+    }\r
   },\r
   "ts-node": {\r
     "esm": true,\r
@@ -102,6 +110,6 @@ def render(request, data = {}):\r
   },\r
   "types": ["node"]\r
 }\r
-`;import{existsSync as y,writeFileSync as E}from"fs";import{existsSync as g,mkdirSync as T,readdirSync as D,readFileSync as x,rmSync as I,unlinkSync as L}from"fs";import{join as i,resolve as v}from"path";import*as a from"url";var j="__svcache__";var n=v(process.cwd()),$=a.fileURLToPath(import.meta.url),M=a.fileURLToPath(new URL(".",import.meta.url)),A=i(n,j),S=g(i(n,"manage.py"));S||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${n} is a Django project directory. Continuing.`);var k=m(),l=m(),J=i(n,l);function m(){let t=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,r=x(i(n,"manage.py"),"utf8").match(t)??[],o=r?.length>3?r[3]:"";if(o==="")throw new Error("Could not extract settings from manage.py. Exiting.");return o.split(".")[0]}import{readFileSync as N}from"fs";import{resolve as H}from"path";import{compile as V}from"svelte/compiler";function f(t,e){return Object.keys(t).forEach(r=>{let o=new RegExp(`{{${r}}}`,"g"),s=new RegExp(`{{!${r}}}`,"g");e=e.replace(o,t[r]),e=e.replace(s,`{{${r}}}`)}),e}import{join as _}from"path";function O(t){let e=_(n,t);return y(e)}function w(t){return _(n,t)}function p(t,e,r={}){function o(s){console.error(`Could not install ${s}. If the file already exists from a previous init, ignore this error.`)}if(O(t))o(t);else try{let s=f(r,e);E(w(t),s)}catch{o(t)}}function h(){p("dxsvelte.py",c,{__main:l}),p("package.json",d,{__main:l}),p("tsconfig.json",u)}h();console.log(`DxSvelte initialisation completed. Remember to run npm i in order to install local dependencies and
+`;import{existsSync as y,writeFileSync as E}from"fs";import{existsSync as g,mkdirSync as T,readdirSync as D,readFileSync as x,rmSync as I,unlinkSync as L}from"fs";import{join as l,resolve as v}from"path";import*as a from"url";var j="__svcache__";var n=v(process.cwd()),$=a.fileURLToPath(import.meta.url),M=a.fileURLToPath(new URL(".",import.meta.url)),A=l(n,j),S=g(l(n,"manage.py"));S||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${n} is a Django project directory. Continuing.`);var k=m(),i=m(),J=l(n,i);function m(){let t=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,r=x(l(n,"manage.py"),"utf8").match(t)??[],o=r?.length>3?r[3]:"";if(o==="")throw new Error("Could not extract settings from manage.py. Exiting.");return o.split(".")[0]}import{readFileSync as N}from"fs";import{resolve as H}from"path";import{compile as V}from"svelte/compiler";function f(t,e){return Object.keys(t).forEach(r=>{let o=new RegExp(`{{${r}}}`,"g"),s=new RegExp(`{{!${r}}}`,"g");e=e.replace(o,t[r]),e=e.replace(s,`{{${r}}}`)}),e}import{join as _}from"path";function O(t){let e=_(n,t);return y(e)}function w(t){return _(n,t)}function p(t,e,r={}){function o(s){console.error(`Could not install ${s}. If the file already exists from a previous init, ignore this error.`)}if(O(t))o(t);else try{let s=f(r,e);E(w(t),s)}catch{o(t)}}function h(){p("dxsvelte.py",c,{__main:i}),p("package.json",d,{__main:i}),p("tsconfig.json",u,{__main:i})}h();console.log(`DxSvelte initialisation completed. Remember to run npm i in order to install local dependencies and
 update your .gitignore to exclude node_modules`);
 //# sourceMappingURL=dxsvelte-init.js.map

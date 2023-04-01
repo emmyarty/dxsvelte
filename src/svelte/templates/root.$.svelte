@@ -1,15 +1,24 @@
 <script>
-  import { currentPathStore, ssrHydrate } from "{{router}}";
+  import { activeViewStore, ssrHydrate, satisfiedStorePath } from "{{router}}";
+  import { writable } from "svelte/store";
   {{layoutImportStatement}};
   {{svelteComponentImports}};
-  export let currentRoute;
+  // {{svelteComponentMap}}
   export let ssrData = {};
-  ssrHydrate(currentRoute, ssrData)
-  currentPathStore.set(currentRoute);
-  currentPathStore.subscribe((value) => {
-    if (currentRoute !== value) {
-      currentRoute = value;
+  export let currentView;
+  export let currentHref = currentView;
+  let trigger = [null]
+
+  ssrHydrate(currentView, ssrData);
+  activeViewStore.set({route: currentView, href: currentHref});
+  activeViewStore.subscribe((value) => {
+    if (typeof window !== "undefined") {
+      console.log('Root component updating to: ', value)
     }
+    const reload = (currentHref !== value.href)
+    currentView = value.route;
+    currentHref = value.href;
+    if (reload) { trigger = [null] }
   });
 </script>
 

@@ -38,5 +38,5 @@ function installConditional(fname: string, document: string, opts: Opts = {}) {
 export function installRootFiles() {
   installConditional("dxsvelte.py", dxsvelteTemplate, { __main });
   installConditional("package.json", packageJsonTemplate, { __main });
-  installConditional("tsconfig.json", tsconfigJsonTemplate);
+  installConditional("tsconfig.json", tsconfigJsonTemplate, { __main });
 }

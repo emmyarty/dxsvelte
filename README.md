@@ -14,12 +14,10 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
-## Bug Fix Release 0.0.17
-- **App Duplication:** Addressed a silly error which would cause the app to be mounted after, rather than over, the SSR content.
-
-## Milestone Release 0.0.16
-- **Django Dict -> Svelte Data Passing:** SSR now comes with a mini payload containing the requested page's props. This gets pulled into the data stores during initialisation instead of being requested for a second time immediately after loading in the browser. Scroll down to see how it works.
-- **Partial Refactor:** A lot of the code under the hood has been changed and minor bugs stamped out. It's for the best.
+## Milestone Release 0.0.18
+- **Route Parameters:** You can now use your **\<str:something\>** values in DxSvelte routes - they work. Use them to customise your server-side props, and build out your individual views as before.
+- **CSS Generation:** CSS now builds successfully where included in the style tags, but be warned that PostCSS will still not work. For now the mixture of component styling & pre-built stylesheets has pushed the outstanding down the priority queue for now, but it is still on the list.
+- **Django Dict -> Svelte Data Passing:** SSR improved and cleaned up, more refactoring.
 
 ## Features
 - **Seamless Integration:** DxSvelte integrates tightly with Django's route resolvers, allowing you to easily build SPAs with Svelte without manually connecting the dots through DRF (though you don't lose that functionality, should you need it). The whole philosophy here is that SPA functionality can and should be a 'first class citizen' in Django.
@@ -33,7 +31,8 @@ DxSvelte is a powerful integration package that enables you to use Svelte as a f
 - **Node Dependency:** Down the road, the aim is to revert back to the embedded V8 runtime. For now, the target platform will need to have NodeJS installed, as well as Python.
 - **VENV Usage:** Configuration options for virtual environments aren't currently supported. Please ensure that 'python' is bound to a version which works with your version of Django so the router resolution during build can take place. This only affects the build step and will not affect how you run your server.
 - **Page Title Updates:** Will be added in the near future.
-- **CSS Generation:** This will be the next key focus.
+- **CSS Generation:** PostCSS support for Tailwind etc.
+- **Type Generation (Autocomplete):** Decision TBC
 
 ------------------------------
 
@@ -114,15 +113,23 @@ That's it! Now you can start building your Svelte-powered hybrid SSR SPA, all wh
 
 ------------------------------
 
-## Passing Server-Side Props
+## Passing Parameters & Server-Side Props
 
 You can now pass your server-side props as a Dict from your Django view directly to Svelte, while still taking full advantage of SSR. Usage is simple, but be sure to validate your objects on the front-end before accessing them. The data argument is optional and can be omitted if you have no server-side properties to pass.
 
 ```py
+urlpatterns = [
+    path('', views.index, name='$index'),
+    path('about/<str:company>/', views.about, name='$about'),
+]
+```
+
+```py
 @csrf_exempt
-def about(req):
+def about(req, company):
     data = {
-        "aboutUsText": "Lorem ipsum dolor sit amet, consectetur adip..."
+        "aboutUsText": "Lorem ipsum dolor sit amet, consectetur adip...",
+        "company": "You are viewing the page for " + company + "!"
     }
     return render(req, data)
 ```
@@ -130,18 +137,18 @@ def about(req):
 Meanwhile, in your **about.svelte** component over in the ./views directory:
 ```jsx
 <script>
-    // The import statement from @dxs below retrieves the server-side props 
-    import { data } from '@dxs'
-    let company = 'DxSvelte'
+    // The import statement from @dxs below retrieves the server-side props.
+    // The line beneath that registers 'data' as a reactive variable from it.
+    import { ServerSideProps } from "@dxs";
+    $: data = $ServerSideProps
     let incrementedValue = 0
     const increment = () => {
 		incrementedValue ++
 	}
 </script>
 
-<h1>About {company}.</h1>
-
-{#if data.aboutUsText}
+{#if data?.company && data.aboutUsText}
+    <h1>About {data.company}.</h1>
 	{data.aboutUsText}
 {/if}
 

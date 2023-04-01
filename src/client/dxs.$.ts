@@ -5,11 +5,6 @@
 import core from `{{fnameRouter}}`
 const route = `{{path}}`
 
-export const data = {}
+export const ServerSideProps = core.serverDataStore[route].data
 
-function mutateObject(source: any, target: any) {
-    Object.keys(target).forEach(key => delete target[key])
-    Object.assign(target, source);
-}
-
-core.serverDataStore[route].data.subscribe((update: any) => mutateObject(update, data))
+export default { ServerSideProps }
