@@ -7,7 +7,25 @@ declare global {
   }
 }
 
-function onlyPath(path: string) {
+function isLocalURL(url: string): boolean {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return true
+  }
+  const constructedUrl = new URL(url);
+  const currentUrl = new URL(window.location.href);
+  return constructedUrl.host === currentUrl.host && constructedUrl.port === currentUrl.port;
+}
+
+function getLocalURL(url: string): string {
+  const constructedUrl = new URL(url);
+  const path = constructedUrl.pathname.slice(1);
+  return path ? `/${path}` : '/';
+}
+
+export function onlyPath(path: string) {
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    path = getLocalURL(path)
+  }
   let queryIndex = path.indexOf("?");
   if (queryIndex !== -1) {
     path = path.slice(0, queryIndex);
@@ -58,7 +76,7 @@ class ServerDataStore {
       const hostnameQualified = `${hostname}${
         port && port !== portDefault ? ":" + port : ""
       }`;
-      const loc = `${protocol}//${hostnameQualified}${validatedTarget}`;
+      const loc = `${protocol}//${hostnameQualified}${validatedTarget}/`;
       // Note: CSRF?
       const reqOptions = {
         method: "DXS",
@@ -147,23 +165,50 @@ function refreshServerStore(targetStorePath: string) {
   return fetchedStore.fetch(targetStorePath);
 }
 
-export const goto = (href: string) => {
+export const goto = (href: string, ignoreHistoryState: boolean = false) => {
   return async () => {
+    // Guard clause to navigate to destinations not on the same host
+    if (!isLocalURL(href)) {
+      return window.history.pushState({}, "", href)
+    }
     const thisPath = onlyPath(href);
-    // Guard clause to navigate to destinations not within the scope of the SPA router
+    // Check whether the new route is within the scope of the SPA router
     const validPath = satisfiedStorePath(thisPath)
     if (!validPath) {
       return (window.location.href = href)
     }
     // Push the href into the history stack and update the stored location
     await refreshServerStore(thisPath);
-    window.history.pushState({}, "", href);
+    if (!ignoreHistoryState) window.history.pushState({}, "", href);
     activeViewStore.set({
       route: validPath,
       href: thisPath
     });
   };
 };
+
+function isHashChange(url1: string, url2: string): boolean {
+  function normaliseUrl (url: string): [string, null|string] {
+    const [base, queryString] = url1.split('?');
+    const hash = url.split('#')[1];
+    const normalisedBase = base.replace(/\/+$/, '');
+    let result = normalisedBase
+    if (typeof queryString === 'string') {
+      result += `?${queryString}`
+    }
+    if (typeof hash === 'string') {
+      result += `#${hash}`
+    }
+    const hashResult = (typeof hash === 'string') ? hash : null
+    return [result, hashResult]
+  }
+  const normalUrl1 = normaliseUrl(url1)
+  const normalUrl2 = normaliseUrl(url2)
+  if (normalUrl1[0] === normalUrl2[0] && normalUrl1[1] !== normalUrl2[1]) {
+    return true
+  }
+  return false
+}
 
 if (
   typeof window !== "undefined" &&
@@ -173,25 +218,26 @@ if (
   // Clean the temporary payload from the DOM
   Array.from(document.getElementsByTagName('script')).forEach(script => (script.innerHTML.includes('window.initialDataPayload')) && script.remove())
   function hrefHandle(e: MouseEvent) {
-    if (
-      e?.target &&
-      e.target instanceof HTMLElement &&
-      e.target.tagName.toLowerCase() === "a"
-    ) {
-      e.preventDefault();
-      const href = e.target.getAttribute("href");
-      if (typeof href !== "string") {
-        return console.error("Invalid Href Attribute");
-      }
-      goto(href)();
+    let target = e.target as HTMLElement|null;
+    while (target && target.tagName.toLowerCase() !== "a") {
+      target = target.parentElement;
     }
+    if (!(target && target instanceof HTMLElement)) {
+      return null
+    }
+    // We need to safely handle events where the URL change is only a hash change before proceeding.
+    const href = target.getAttribute("href");
+    if (typeof href === "string" && isHashChange(href, window.location.href)) {
+      return console.log("Hash change detected.")
+    }
+    e.preventDefault();
+    if (typeof href !== "string") {
+      return console.error("Invalid Href Attribute");
+    }
+    goto(href)();
   }
   document.addEventListener("click", function (e: MouseEvent) {
-    if (e?.target && e.target instanceof HTMLElement) {
-      if (e.target.tagName.toLowerCase() === "a") {
-        hrefHandle(e);
-      }
-    }
+    hrefHandle(e)
   });
   document.addEventListener("keydown", function (e: KeyboardEvent) {
     if (
@@ -201,6 +247,12 @@ if (
     ) {
       e.target.click();
     }
+  });
+  window.addEventListener('popstate', (event: PopStateEvent) => {
+    event.preventDefault();
+    const navTo = (event.target as Window)?.location?.href ?? '';
+    console.log('Pop state: ', navTo)
+    goto(navTo, true)();
   });
 }
 

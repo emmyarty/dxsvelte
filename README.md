@@ -14,9 +14,12 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
-## Patch 0.0.19
-- **Default HTML CSS:** It now includes a reference to the CSS build artefacts in the built-in HTML template string - it's still recommended that you bring your own HTML template, however.
-- **Redundant Code Generation:** DxSvelte.py is now a static script with no generated content, it is only inserted by the installer.
+## Patch 0.0.20
+- **Router Improvements:** Addressed a long-standing hole in the resolver which made it impossible to have views directly on the root path; index pages no longer need workarounds. The front-end router is now more feature complete as well, with backwards and forwards navigation through history in place.
+- **Introduced @common:** A global utilities module can now be imported anywhere in your SPA, which will expose useful objects over time. At the moment, it contains a ViewState store which returns a 'pathSatisfies' function property - useful for evaluating your links against the current page to apply your 'active' CSS classes in nav bars etc.
+- **Renamed @dxs to @page:** With the introduction of @common, it seems sensible to rename @dxs to something a bit more meaningful.
+- **Fixed newline preservation:** Dict -> JSON SSP payloads were losing their newlines; this has been addressed. There is still an outstanding issue with special characters that will be dealt with imminently.
+- **Svelte Version Update:** Updated Svelte dependency to 3.58.0.
 
 ## Milestone Release 0.0.18
 - **Route Parameters:** You can now use your **\<str:something\>** values in DxSvelte routes - they work. Use them to customise your server-side props, and build out your individual views as before.
@@ -141,9 +144,9 @@ def about(req, company):
 Meanwhile, in your **about.svelte** component over in the ./views directory:
 ```jsx
 <script>
-    // The import statement from @dxs below retrieves the server-side props.
+    // The import statement from @page below retrieves the server-side props.
     // The line beneath that registers 'data' as a reactive variable from it.
-    import { ServerSideProps } from "@dxs";
+    import { ServerSideProps } from "@page";
     $: data = $ServerSideProps
     let incrementedValue = 0
     const increment = () => {

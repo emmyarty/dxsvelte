@@ -1,3 +1,4 @@
+import base64
 from django.http import HttpResponse
 from django.conf import settings
 from django.urls import resolve
@@ -5,6 +6,8 @@ from os.path import join, exists
 from subprocess import run
 from urllib.parse import quote
 import json
+
+from py_mini_racer import MiniRacer
 
 # Currently unused, on the to-do list
 from django.middleware import csrf
@@ -41,9 +44,15 @@ def _normalise_url(url):
     url = "/" + url.lstrip("/")
     return url
 
+class JSONEncoderEscaped(json.JSONEncoder):
+    def encode(self, obj):
+        json_string = super().encode(obj)
+        return json_string.replace('\n', '\\n')
+
 def _render(req_path, data = {}):
-    json_string = json.dumps(data)
-    encoded_str = quote(json_string)
+    json_data = json.dumps(data, ensure_ascii=False, cls=JSONEncoderEscaped)
+    encoded_data = base64.b64encode(json_data.encode('utf-8')).decode('utf-8')
+    encoded_str = encoded_data.replace('+', '-').replace('/', '_')
     node = run(["node", svelte_ssr_js_path, req_path, encoded_str], capture_output=True, check=True)
     stdout = node.stdout.decode("utf-8")
     node_dict = json.loads(stdout)

@@ -5,8 +5,6 @@ import App from '{{App}}';
 const SSRPATH = process.argv[2];
 const SSRJSON = process.argv[3];
 
-// const writer = process.stdout.write
-// process.stdout.write = () => null
 const __console = console;
 
 const currentView = SSRPATH ?? "/"
@@ -17,11 +15,31 @@ let jsonString = ''
 let jsonObject = {}
 
 try {
-  jsonString = decodeURIComponent(SSRJSON)
+  const base64JsonString = SSRJSON.replace(/-/g, '+').replace(/_/g, '/');
+  const padding = base64JsonString.length % 4;
+  const paddedBase64String = padding ? base64JsonString + 'A'.repeat(4 - padding) : base64JsonString;
+  const buffer = Buffer.from(paddedBase64String, 'base64');
+  jsonString = buffer.toString('utf-8');
+
   jsonObject = JSON.parse(jsonString)
   initialDataPayload[currentView] = jsonObject
+
   initialDataPayloadScript = `<script>
-  window.initialDataPayload = { route: \`${currentView}\`, data: JSON.parse(\`${jsonString}\`) }
+  function unwrap(payload) {
+    const base64JsonString = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const padding = base64JsonString.length % 4;
+    const paddedBase64String = padding ? base64JsonString + '='.repeat(4 - padding) : base64JsonString;
+    const jsonString = atob(paddedBase64String, 'base64');
+    try {
+      console.log(jsonString)
+      return JSON.parse(jsonString);
+    } catch (err) {
+      console.error(err);
+      return {}
+    }
+  }
+  const payload = \`${SSRJSON}\`
+  window.initialDataPayload = { route: \`${currentView}\`, data: unwrap(payload) }
   </script>`
 } catch (err) {
   

@@ -1,6 +1,6 @@
 import { join } from "path";
 import { Pattern, Resolver, Route } from "./routerTypes";
-import { __basedir, __cache } from "../settings/config";
+import { app_name, __basedir, __cache } from "../settings/config";
 import { writeFileSync } from "fs";
 
 function posixSlash(str: string | null) {
@@ -45,13 +45,20 @@ export function translateDjangoResolver(input: Resolver[]) {
       });
     }
     // We need to rework this massively. It's not enough to assume that every resolver marked to be included will be the child of an included view.
-    // Additionally, we've broken the home page!
-    // The fix to this will be to coerce the route as a 'Resolver' with a blank prefix. Resolvers (can) have Patterns, but Patterns don't have Resolvers.
     if (data.type === "pattern") {
       if (
         !parent ||
+        !parent.app_path
+      ) {
+        parent = {
+          app_path: app_name,
+          type: "resolver",
+          prefix: ""
+        }
+      }
+      if (
+        !parent ||
         !parent.app_path ||
-        !parent.prefix ||
         typeof data.pattern !== "string" ||
         !data.name ||
         data.name[0] !== "$"

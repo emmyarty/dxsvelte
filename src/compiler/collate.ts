@@ -8,11 +8,13 @@ import entrypointSSR from "../svelte/templates/entrypoint-ssr.$.js";
 //@ts-ignore
 import entrypointCSR from "../svelte/templates/entrypoint-csr.$.js";
 
-// Import the router script and component linkers
+// Import the router script, component linkers, and common utils
 //@ts-ignore
 import routerDefault from "../client/router.$.ts";
 //@ts-ignore
-import linkerDefault from "../client/dxs.$.ts";
+import linkerDefault from "../client/page.$.ts";
+//@ts-ignore
+import commonDefault from "../client/common.$.ts";
 
 // General Imports
 import type { Route } from "../resolver/routerTypes";
@@ -60,10 +62,6 @@ export function constructCompiler(router: Route[]) {
     `import ${route.component} from '${route.filename}'`;
   const routeIfs = (route: Route) =>
     `{#each trigger as instance}{#if satisfiedStorePath(currentView) === '${route.path}'}<${route.component}></${route.component}>{/if}{/each}`;
-  
-  // const svelteComponentMap = () => {
-  //   const body = router.map(route => `["${route.path}"]: ${route.component}`)
-  // } 
 
   const svelteComponentImportsArr = router.map((route) => routeImports(route));
   const svelteComponentsIfsArr = router.map((route) => routeIfs(route));
@@ -76,7 +74,7 @@ export function constructCompiler(router: Route[]) {
   const fnameRouter = posixSlash(join(__maindir, "router.vf.ts"));
   const configuredRouter = injectOptionsIntoString(
     { router: strRouterArray },
-    routerDefault
+    routerDefault as unknown as string
   );
   injectFile(fnameRouter, configuredRouter);
 
@@ -90,18 +88,26 @@ export function constructCompiler(router: Route[]) {
     rootDefaultSvelte as unknown as string
   );
 
-  // Inject a local .vf.ts for each route component
+  // Inject a local .page.vf.ts for each route component
   const routeLinker = (route: Route) => {
     const conf = {
       path: route.path,
       fnameRouter,
     };
-    const linkerLocalised = injectOptionsIntoString(conf, linkerDefault);
-    const fname = `${route.filename}.dxs.vf.ts`;
+    const linkerLocalised = injectOptionsIntoString(conf, linkerDefault as unknown as string);
+    const fname = `${route.filename}.page.vf.ts`;
     injectFile(fname, linkerLocalised);
   };
 
   router.map((route) => routeLinker(route));
+
+  // Inject the Common utils
+  const fnameCommon = posixSlash(join(__cache, "common.vf.ts"))
+  const configuredCommon = injectOptionsIntoString(
+    { fnameRouter },
+    commonDefault as unknown as string
+  );
+  injectFile(fnameCommon, configuredCommon);
 
   // Create the Svelte App import strings for the entrypoint files and inject them into the files
   const configuredEntrypointSSR = injectOptionsIntoString(

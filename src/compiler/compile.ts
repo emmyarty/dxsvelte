@@ -4,7 +4,7 @@ import esbuildSvelte from "esbuild-svelte";
 import { join, resolve } from "path";
 import { CompileOptions } from "svelte/types/compiler";
 import { StdinOptions } from "esbuild";
-import { __maindir, __basedir } from "../settings/config";
+import { __maindir, __basedir, __cache } from "../settings/config";
 
 import { vfLoaderPlugin } from "./injector";
 import { mkdirSync, existsSync } from "fs";
@@ -17,10 +17,16 @@ function svelteDataResolver(): Plugin {
   return {
     name: 'svelte-data-resolver',
     setup(build) {
-      build.onResolve({ filter: /^@dxs$/ }, (args) => {
+      build.onResolve({ filter: /^@page$/ }, (args) => {
         const original = posixSlash(args.importer)
-        const path = `${original}.dxs.vf.ts`
-        console.log('Virtual @dxs: ', path)
+        const path = `${original}.page.vf.ts`
+        console.log('Virtual @page: ', path)
+        return {
+          path
+        };
+      });
+      build.onResolve({ filter: /^@common$/ }, () => {
+        const path = posixSlash(join(__cache, "common.vf.ts"))
         return {
           path
         };
