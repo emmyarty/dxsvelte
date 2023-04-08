@@ -14,6 +14,11 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
+## Patch 0.0.21
+- **Reverted to Py Mini Racer:** Preparing to migrate the Python dependencies to its own package down the road; for now, you will need to manually add py_mini_racer to your Python requirements and ensure it's installed. SSR without NodeJS is back. You'll still need NodeJS during development, of course.
+- **Omitted HTTP Method:** This was overdue, GET is GET whether via CSR or SSR.
+- *Now in a good place to start implementing CSRF and Django forms.*
+
 ## Patch 0.0.20
 - **Router Improvements:** Addressed a long-standing hole in the resolver which made it impossible to have views directly on the root path; index pages no longer need workarounds. The front-end router is now more feature complete as well, with backwards and forwards navigation through history in place.
 - **Introduced @common:** A global utilities module can now be imported anywhere in your SPA, which will expose useful objects over time. At the moment, it contains a ViewState store which returns a 'pathSatisfies' function property - useful for evaluating your links against the current page to apply your 'active' CSS classes in nav bars etc.
@@ -132,7 +137,6 @@ urlpatterns = [
 ```
 
 ```py
-@csrf_exempt
 def about(req, company):
     data = {
         "aboutUsText": "Lorem ipsum dolor sit amet, consectetur adip...",

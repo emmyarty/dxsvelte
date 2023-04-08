@@ -24,8 +24,8 @@ const compilerConf = constructCompiler(router);
 console.dir(router)
 
 // Compile the user's application
-await compile(compilerConf.entrypointCSRPath, compilerConf.vfLoaders, "csr");
 await compile(compilerConf.entrypointSSRPath, compilerConf.vfLoaders, "ssr");
+await compile(compilerConf.entrypointCSRPath, compilerConf.vfLoaders, "csr");
 
 // Clean up the cache folder. Sometimes commented out for debugging, need to implement debug flags
-// cleanSvCache();
+cleanSvCache();

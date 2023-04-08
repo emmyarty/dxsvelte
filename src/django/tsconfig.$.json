@@ -14,7 +14,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@{{__main}}/*": ["{{__main}}/*"]
+      "@main/*": ["{{__main}}/*"]
     }
   },
   "ts-node": {

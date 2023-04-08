@@ -79,8 +79,9 @@ class ServerDataStore {
       const loc = `${protocol}//${hostnameQualified}${validatedTarget}/`;
       // Note: CSRF?
       const reqOptions = {
-        method: "DXS",
-        headers: { "Content-Type": "application/json" },
+        method: "GET",
+        headers: { "Content-Type": "application/json", "X-DXS-METHOD": "GET" },
+        // headers: { "Content-Type": "application/json" },
       };
       const resultRaw = await fetch(loc, reqOptions);
       const resultJson = await resultRaw.json();
@@ -150,7 +151,7 @@ export function getComponentFromTargetPath(targetStorePath: string) {
 }
 
 export function ssrHydrate(thisPath: string, payload: any) {
-  if (typeof process !== "undefined" && serverDataStore && serverDataStore[thisPath]) {
+  if (typeof window === 'undefined' && serverDataStore && serverDataStore[thisPath]) {
     serverDataStore[thisPath].data.set(payload)
   }
 }

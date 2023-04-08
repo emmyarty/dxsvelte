@@ -13,6 +13,7 @@
     "esbuild-plugin-inline-import": "^1.0.1",
     "esbuild-plugin-postcss": "^0.1.4",
     "esbuild-svelte": "^0.7.3",
+    "js-base64": "^3.7.5",
     "postcss": "^8.4.21",
     "svelte": "^3.58.0",
     "svelte-preprocess": "^5.0.3"

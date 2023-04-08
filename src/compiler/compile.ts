@@ -1,7 +1,7 @@
 import esbuild, { Plugin } from "esbuild";
 import esbuildSvelte from "esbuild-svelte";
 // import postcssPlugin from "esbuild-plugin-postcss";
-import { join, resolve } from "path";
+import { join } from "path";
 import { CompileOptions } from "svelte/types/compiler";
 import { StdinOptions } from "esbuild";
 import { __maindir, __basedir, __cache } from "../settings/config";
@@ -64,9 +64,8 @@ export async function compile(
   } catch (err) {}
 
   const outfile =
-    ver === "ssr"
-      ? join(__maindir, "svelte.ssr.js")
-      : join(__basedir, "static", "svelte.csr.js");
+    ver === "ssr" ? join(__maindir, "svelte.ssr.js")
+    : join(__basedir, "static", "svelte.csr.js")
 
   async function loadRootConfig(filePrefix: string): Promise<any> {
     const fextns = [

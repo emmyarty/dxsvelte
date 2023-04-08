@@ -77,7 +77,7 @@ with open('./{{cache}}/routerResolver.json', 'w') as file:\r
 \r
 #+DEBUG+#\r
 print(output)\r
-#+DEBUG+#`;import{join as q}from"path";import{existsSync as V,mkdirSync as fr,readdirSync as B,readFileSync as mr,rmSync as dr,unlinkSync as F}from"fs";import{join as S,resolve as hr}from"path";import*as L from"url";var E="__svcache__",gr="python",l=hr(process.cwd()),Sr=L.fileURLToPath(import.meta.url),vr=L.fileURLToPath(new URL(".",import.meta.url)),i=S(l,E),yr=V(S(l,"manage.py"));yr||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${l} is a Django project directory. Continuing.`);var $=G(),M=G(),h=S(l,M);function G(){let r=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,e=mr(S(l,"manage.py"),"utf8").match(r)??[],n=e?.length>3?e[3]:"";if(n==="")throw new Error("Could not extract settings from manage.py. Exiting.");return n.split(".")[0]}function U(){V(i)?B(i).forEach(t=>{let e=S(i,t);F(e)}):fr(i,{recursive:!0})}function wr(){B(i).forEach(t=>{let e=S(i,t);F(e)}),dr(i,{recursive:!0,force:!0}),console.log(`Cleaned ${E} artefacts.`)}var T={app_name:$,cache:E,pythonCmd:gr,__basedir:l,__filename:Sr,__dirname:vr,__cache:i,__main:M,__maindir:h,prepareSvCache:U,cleanSvCache:wr};import{writeFileSync as _r}from"fs";function Pr(r){return r&&r.replace(/\\/g,"/")}function br(r,t){if(t.length<2)throw new Error(`${t} is not a valid component file.`);let e=`${t.slice(1)}.svelte`;return Pr(q(l,r,"views",e))}function Rr(r){return r.length<2?r:r.charAt(1).toUpperCase()+r.slice(2).replace("$","")}function xr(r){if(r.length===0)return r;let t=r.charAt(0).toUpperCase();return r.length===1?t:t+r.slice(1)}function W(...r){return"/"+r.join("/").replace(/\/\/+/g,"/").replace(/^\/|\/$/g,"")}function Q(r){let t=[],e=(n,o)=>{if(o.type==="resolver"){if(!Array.isArray(o.url_patterns))return null;o.url_patterns.map(s=>{e({...o},s)})}if(o.type==="pattern"){if((!n||!n.app_path)&&(n={app_path:$,type:"resolver",prefix:""}),!n||!n.app_path||typeof o.pattern!="string"||!o.name||o.name[0]!=="$")return null;let s={app:n.app_path,path:n.prefix?W(n.prefix,o.pattern):W(o.pattern),view:o.name??null,component:o.name?xr(n.app_path)+Rr(o.name):null,filename:o.name&&n.app_path?br(n.app_path,o.name):null};t.push(s)}};return Array.isArray(r)&&(r.map(n=>e(null,n)),_r(q(i,"debugRouter.json"),JSON.stringify(t,null,2))),t}import{execSync as Dr}from"child_process";import{readFileSync as Cr,writeFileSync as Lr}from"fs";import z from"path";import{readFileSync as Xr}from"fs";import{resolve as X}from"path";import{compile as jr}from"svelte/compiler";function m(r,t){return Object.keys(r).forEach(e=>{let n=new RegExp(`{{${e}}}`,"g"),o=new RegExp(`{{!${e}}}`,"g");t=t.replace(n,r[e]),t=t.replace(o,`{{${e}}}`)}),t}function Or(r,t){let e=X(r);return t.find(n=>X(n.sourcefile)===e)??null}function K(r=[],t){return{name:"virtual-file-injector",setup(e){e.onResolve({filter:/\.vf\.[\S]+$/},async n=>(console.log("VF Resolved: "+n.path),{path:n.path})),e.onLoad({filter:/\.vf\.[\S]+$/},async n=>{let o=Or(n.path,r),s=o.contents,p=o.loader;if(p==="svelte"){let f=jr(s,t)?.js?.code??null;if(!f)throw new Error("Compilation Failed for: "+n.path);return{contents:f,loader:"js"}}return{contents:s,loader:p}})}}}var{__cache:Y,app_name:Er,cache:$r}=T;function Z(){console.log("Getting router...");function r(s,p){let u=new RegExp(`#\\+${p}\\+#([\\s\\S]*?)#\\+${p}\\+#`,"gm"),f=new RegExp("#\\+([\\S]*?)\\+#","gm");return s=s.replace(u,""),s=s.replace(f,""),s}let t;t=process.env.NODE_ENV==="debug"?r(C,"OPERATIONAL"):r(C,"DEBUG"),t=m({app_name:Er,cache:$r},t);function e(){let s=z.join(Y,"tmp"),p=z.join(Y,"routerResolver.json");try{Lr(s,t),Dr(`${T.pythonCmd} ${s}`);let u=Cr(p,"utf8");return JSON.parse(u)}catch(u){throw console.error(u),new Error("Could Not Load Django Router Object")}}let n=e();return Q(n)}var rr="<slot/>";var tr=`<script>\r
+#+DEBUG+#`;import{join as X}from"path";import{existsSync as M,mkdirSync as mr,readdirSync as B,readFileSync as dr,rmSync as hr,unlinkSync as F}from"fs";import{join as S,resolve as gr}from"path";import*as L from"url";var E="__svcache__",Sr="python",l=gr(process.cwd()),vr=L.fileURLToPath(import.meta.url),yr=L.fileURLToPath(new URL(".",import.meta.url)),i=S(l,E),wr=M(S(l,"manage.py"));wr||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${l} is a Django project directory. Continuing.`);var $=W(),G=W(),h=S(l,G);function W(){let r=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,e=dr(S(l,"manage.py"),"utf8").match(r)??[],n=e?.length>3?e[3]:"";if(n==="")throw new Error("Could not extract settings from manage.py. Exiting.");return n.split(".")[0]}function T(){M(i)?B(i).forEach(t=>{let e=S(i,t);F(e)}):mr(i,{recursive:!0})}function U(){B(i).forEach(t=>{let e=S(i,t);F(e)}),hr(i,{recursive:!0,force:!0}),console.log(`Cleaned ${E} artefacts.`)}var A={app_name:$,cache:E,pythonCmd:Sr,__basedir:l,__filename:vr,__dirname:yr,__cache:i,__main:G,__maindir:h,prepareSvCache:T,cleanSvCache:U};import{writeFileSync as _r}from"fs";function Pr(r){return r&&r.replace(/\\/g,"/")}function Rr(r,t){if(t.length<2)throw new Error(`${t} is not a valid component file.`);let e=`${t.slice(1)}.svelte`;return Pr(X(l,r,"views",e))}function br(r){return r.length<2?r:r.charAt(1).toUpperCase()+r.slice(2).replace("$","")}function xr(r){if(r.length===0)return r;let t=r.charAt(0).toUpperCase();return r.length===1?t:t+r.slice(1)}function q(...r){return"/"+r.join("/").replace(/\/\/+/g,"/").replace(/^\/|\/$/g,"")}function Q(r){let t=[],e=(n,o)=>{if(o.type==="resolver"){if(!Array.isArray(o.url_patterns))return null;o.url_patterns.map(a=>{e({...o},a)})}if(o.type==="pattern"){if((!n||!n.app_path)&&(n={app_path:$,type:"resolver",prefix:""}),!n||!n.app_path||typeof o.pattern!="string"||!o.name||o.name[0]!=="$")return null;let a={app:n.app_path,path:n.prefix?q(n.prefix,o.pattern):q(o.pattern),view:o.name??null,component:o.name?xr(n.app_path)+br(o.name):null,filename:o.name&&n.app_path?Rr(n.app_path,o.name):null};t.push(a)}};return Array.isArray(r)&&(r.map(n=>e(null,n)),_r(X(i,"debugRouter.json"),JSON.stringify(t,null,2))),t}import{execSync as Dr}from"child_process";import{readFileSync as Cr,writeFileSync as Lr}from"fs";import Y from"path";import{readFileSync as Qr}from"fs";import{resolve as K}from"path";import{compile as jr}from"svelte/compiler";function m(r,t){return Object.keys(r).forEach(e=>{let n=new RegExp(`{{${e}}}`,"g"),o=new RegExp(`{{!${e}}}`,"g");t=t.replace(n,r[e]),t=t.replace(o,`{{${e}}}`)}),t}function Or(r,t){let e=K(r);return t.find(n=>K(n.sourcefile)===e)??null}function z(r=[],t){return{name:"virtual-file-injector",setup(e){e.onResolve({filter:/\.vf\.[\S]+$/},async n=>(console.log("VF Resolved: "+n.path),{path:n.path})),e.onLoad({filter:/\.vf\.[\S]+$/},async n=>{let o=Or(n.path,r),a=o.contents,p=o.loader;if(p==="svelte"){let f=jr(a,t)?.js?.code??null;if(!f)throw new Error("Compilation Failed for: "+n.path);return{contents:f,loader:"js"}}return{contents:a,loader:p}})}}}var{__cache:Z,app_name:Er,cache:$r}=A;function rr(){console.log("Getting router...");function r(a,p){let u=new RegExp(`#\\+${p}\\+#([\\s\\S]*?)#\\+${p}\\+#`,"gm"),f=new RegExp("#\\+([\\S]*?)\\+#","gm");return a=a.replace(u,""),a=a.replace(f,""),a}let t;t=process.env.NODE_ENV==="debug"?r(C,"OPERATIONAL"):r(C,"DEBUG"),t=m({app_name:Er,cache:$r},t);function e(){let a=Y.join(Z,"tmp"),p=Y.join(Z,"routerResolver.json");try{Lr(a,t),Dr(`${A.pythonCmd} ${a}`);let u=Cr(p,"utf8");return JSON.parse(u)}catch(u){throw console.error(u),new Error("Could Not Load Django Router Object")}}let n=e();return Q(n)}var tr="<slot/>";var er=`<script>\r
   import { activeViewStore, ssrHydrate, satisfiedStorePath } from "{{router}}";\r
   import { writable } from "svelte/store";\r
   {{layoutImportStatement}};\r
@@ -105,33 +105,28 @@ print(output)\r
 <Layout>\r
   {{svelteComponentsIfs}}\r
 </Layout>\r
-`;var er=`// Import compiled SSR Svelte app.\r
+`;var nr=`// Before evaluating this script, we must set the SSRPATH and SSRJSON variables within the context object\r
+\r
+// Import compiled SSR Svelte app.\r
 import App from '{{App}}';\r
-\r
-// Janky temporary workaround to avoid unneeded stdio outputs\r
-const SSRPATH = process.argv[2];\r
-const SSRJSON = process.argv[3];\r
-\r
-const __console = console;\r
+import { decode } from 'js-base64';\r
 \r
 const currentView = SSRPATH ?? "/"\r
 \r
 let initialDataPayload = {}\r
-let initialDataPayloadScript = ''\r
-let jsonString = ''\r
-let jsonObject = {}\r
+let payload = ''\r
+let ssrData = {}\r
 \r
 try {\r
   const base64JsonString = SSRJSON.replace(/-/g, '+').replace(/_/g, '/');\r
   const padding = base64JsonString.length % 4;\r
-  const paddedBase64String = padding ? base64JsonString + 'A'.repeat(4 - padding) : base64JsonString;\r
-  const buffer = Buffer.from(paddedBase64String, 'base64');\r
-  jsonString = buffer.toString('utf-8');\r
+  const paddedBase64String = padding ? base64JsonString + '='.repeat(4 - padding) : base64JsonString;\r
+  const ssrDataString = decode(paddedBase64String);\r
 \r
-  jsonObject = JSON.parse(jsonString)\r
-  initialDataPayload[currentView] = jsonObject\r
+  ssrData = JSON.parse(ssrDataString)\r
+  initialDataPayload[currentView] = ssrData\r
 \r
-  initialDataPayloadScript = \`<script>\r
+  payload = \`<script>\r
   function unwrap(payload) {\r
     const base64JsonString = payload.replace(/-/g, '+').replace(/_/g, '/');\r
     const padding = base64JsonString.length % 4;\r
@@ -145,35 +140,21 @@ try {\r
       return {}\r
     }\r
   }\r
-  const payload = \\\`\${SSRJSON}\\\`\r
-  window.initialDataPayload = { route: \\\`\${currentView}\\\`, data: unwrap(payload) }\r
+  const payload = "\${SSRJSON}"\r
+  window.initialDataPayload = { route: "\${currentView}", data: unwrap(payload) }\r
   </script>\`\r
-} catch (err) {\r
-  \r
-}\r
-\r
-console = new Proxy(\r
-  {},\r
-  {\r
-    get(target, prop) {\r
-      return function () {};\r
-    },\r
-  }\r
-);\r
+} catch (err) { }\r
 \r
 // Mount and render the application\r
 const { head, html, css } = App.render({\r
   currentView,\r
-  ssrData: jsonObject\r
+  ssrData\r
 });\r
 \r
-const htmlPreload = html + initialDataPayloadScript\r
+const htmlPreload = html + payload\r
 \r
 // Gather the application parts back into an object and serialise them into JSON\r
-const outputJSON = JSON.stringify({ head, html: htmlPreload, css });\r
-\r
-// Pipe the output into the console using the hijacked console\r
-__console.log(outputJSON);`;var nr=`// Import compiled CSR Svelte app.\r
+const result = JSON.stringify({ head, html: htmlPreload, css });`;var or=`// Import compiled CSR Svelte app.\r
 import App from '{{App}}';\r
 \r
 // Clean up the pathname argument.\r
@@ -196,7 +177,7 @@ new App({\r
 })\r
 \r
 // Replace the current document.body with the new DOM node hosting the app\r
-document.body.replaceWith(container);`;var or=`import { Writable, writable } from "svelte/store";\r
+document.body.replaceWith(container);`;var ar=`import { Writable, writable } from "svelte/store";\r
 \r
 declare global {\r
   interface Window {\r
@@ -277,8 +258,9 @@ class ServerDataStore {\r
       const loc = \`\${protocol}//\${hostnameQualified}\${validatedTarget}/\`;\r
       // Note: CSRF?\r
       const reqOptions = {\r
-        method: "DXS",\r
-        headers: { "Content-Type": "application/json" },\r
+        method: "GET",\r
+        headers: { "Content-Type": "application/json", "X-DXS-METHOD": "GET" },\r
+        // headers: { "Content-Type": "application/json" },\r
       };\r
       const resultRaw = await fetch(loc, reqOptions);\r
       const resultJson = await resultRaw.json();\r
@@ -348,7 +330,7 @@ export function getComponentFromTargetPath(targetStorePath: string) {\r
 }\r
 \r
 export function ssrHydrate(thisPath: string, payload: any) {\r
-  if (typeof process !== "undefined" && serverDataStore && serverDataStore[thisPath]) {\r
+  if (typeof window === 'undefined' && serverDataStore && serverDataStore[thisPath]) {\r
     serverDataStore[thisPath].data.set(payload)\r
   }\r
 }\r
@@ -467,7 +449,7 @@ const route = \`{{path}}\`\r
 \r
 export const ServerSideProps = core.serverDataStore[route].data\r
 \r
-export default { ServerSideProps }`;var ar=`// This is a file which gets generated per module and in the same directory.\r
+export default { ServerSideProps }`;var ir=`// This is a file which gets generated per module and in the same directory.\r
 // It ensures that objects being imported are 'localised' as appropriate.\r
 \r
 //@ts-ignore\r
@@ -482,7 +464,7 @@ viewStore.subscribe(value => {\r
     ViewState.set({ pathSatisfies: (pathToTest: string) => onlyPath(pathToTest) === value.href })\r
 })\r
 \r
-export default { ViewState }`;import{existsSync as Ur}from"fs";function c(r){return r&&r.replace(/\\/g,"/")}import{join as g}from"path";function ir(r){let t=[];function e(a,O){let b=a.split("."),D=b[b.length-1],ur={contents:O,sourcefile:a,loader:D};t.push(ur)}let n=c(g(h,"layout.svelte"));Ur(n)||(n=c(g(h,"layout.vf.svelte")),e(n,rr));let o=c(g(i,"root.vf.svelte")),s=`import Layout from '${n}'`,p=a=>`import ${a.component} from '${a.filename}'`,u=a=>`{#each trigger as instance}{#if satisfiedStorePath(currentView) === '${a.path}'}<${a.component}></${a.component}>{/if}{/each}`,f=r.map(a=>p(a)),x=r.map(a=>u(a)),J=f.join(`
+export default { ViewState }`;import{existsSync as Tr}from"fs";function c(r){return r&&r.replace(/\\/g,"/")}import{join as g}from"path";function lr(r){let t=[];function e(s,O){let R=s.split("."),D=R[R.length-1],fr={contents:O,sourcefile:s,loader:D};t.push(fr)}let n=c(g(h,"layout.svelte"));Tr(n)||(n=c(g(h,"layout.vf.svelte")),e(n,tr));let o=c(g(i,"root.vf.svelte")),a=`import Layout from '${n}'`,p=s=>`import ${s.component} from '${s.filename}'`,u=s=>`{#each trigger as instance}{#if satisfiedStorePath(currentView) === '${s.path}'}<${s.component}></${s.component}>{/if}{/each}`,f=r.map(s=>p(s)),x=r.map(s=>u(s)),J=f.join(`
 `),j=x.join(`
-`),d=JSON.stringify(r.map(a=>a.path)),v=c(g(h,"router.vf.ts")),A=m({router:d},or);e(v,A);let P=m({router:v,layoutImportStatement:s,svelteComponentImports:J,svelteComponentsIfs:j},tr),N=a=>{let O={path:a.path,fnameRouter:v},b=m(O,sr),D=`${a.filename}.page.vf.ts`;e(D,b)};r.map(a=>N(a));let y=c(g(i,"common.vf.ts")),w=m({fnameRouter:v},ar);e(y,w);let pr=m({App:o},er),cr=m({App:o},nr),I=`${c(g(i,"ssr.vf.js"))}`,H=`${c(g(i,"csr.vf.js"))}`;return e(o,P),e(I,pr),e(H,cr),{vfLoaders:t,entrypointSSRPath:I,entrypointCSRPath:H}}import Tr from"esbuild";import kr from"esbuild-svelte";import{join as _}from"path";import{mkdirSync as Jr,existsSync as Ar}from"fs";import{pathToFileURL as Nr}from"url";function Ir(){return{name:"svelte-data-resolver",setup(r){r.onResolve({filter:/^@page$/},t=>{let n=`${c(t.importer)}.page.vf.ts`;return console.log("Virtual @page: ",n),{path:n}}),r.onResolve({filter:/^@common$/},()=>({path:c(_(i,"common.vf.ts"))}))}}}async function k(r,t,e){console.log("Compiling...",e,r);let s=e==="ssr"?{generate:"ssr",dev:!1,hydratable:!0,format:"esm",css:!0}:{generate:"dom",dev:!1,format:"esm"};try{Jr(_(l,"static"))}catch{}let p=e==="ssr"?_(h,"svelte.ssr.js"):_(l,"static","svelte.csr.js");async function u(d){let P=[d+".js",d+".mjs",d+".cjs"].map(w=>_(l,w)).find(w=>Ar(w));if(!P)return[];let y=await import(Nr(P).toString());if(typeof y<"u")return console.log("Loaded "+d),console.log(y),y}let f=e==="ssr"?{preprocess:[]}:await u("svelte.config"),x=f?.preprocess?f.preprocess:[],J=!0,j=[K(t,s),Ir(),kr({preprocess:x,compilerOptions:s})];return Tr.build({entryPoints:[r],mainFields:["svelte","browser","module","main"],bundle:!0,outfile:p,format:"esm",plugins:j}).catch(()=>{console.error(e==="csr"?"CSR Application Build Failed. Exiting.":"SSR Application Build Failed. Exiting."),process.exit(1)})}U();var lr=Z(),R=ir(lr);console.dir(lr);await k(R.entrypointCSRPath,R.vfLoaders,"csr");await k(R.entrypointSSRPath,R.vfLoaders,"ssr");
+`),d=JSON.stringify(r.map(s=>s.path)),v=c(g(h,"router.vf.ts")),N=m({router:d},ar);e(v,N);let P=m({router:v,layoutImportStatement:a,svelteComponentImports:J,svelteComponentsIfs:j},er),I=s=>{let O={path:s.path,fnameRouter:v},R=m(O,sr),D=`${s.filename}.page.vf.ts`;e(D,R)};r.map(s=>I(s));let y=c(g(i,"common.vf.ts")),w=m({fnameRouter:v},ir);e(y,w);let cr=m({App:o},nr),ur=m({App:o},or),H=`${c(g(i,"ssr.vf.js"))}`,V=`${c(g(i,"csr.vf.js"))}`;return e(o,P),e(H,cr),e(V,ur),{vfLoaders:t,entrypointSSRPath:H,entrypointCSRPath:V}}import Ur from"esbuild";import Ar from"esbuild-svelte";import{join as _}from"path";import{mkdirSync as kr,existsSync as Jr}from"fs";import{pathToFileURL as Nr}from"url";function Ir(){return{name:"svelte-data-resolver",setup(r){r.onResolve({filter:/^@page$/},t=>{let n=`${c(t.importer)}.page.vf.ts`;return console.log("Virtual @page: ",n),{path:n}}),r.onResolve({filter:/^@common$/},()=>({path:c(_(i,"common.vf.ts"))}))}}}async function k(r,t,e){console.log("Compiling...",e,r);let a=e==="ssr"?{generate:"ssr",dev:!1,hydratable:!0,format:"esm",css:!0}:{generate:"dom",dev:!1,format:"esm"};try{kr(_(l,"static"))}catch{}let p=e==="ssr"?_(h,"svelte.ssr.js"):_(l,"static","svelte.csr.js");async function u(d){let P=[d+".js",d+".mjs",d+".cjs"].map(w=>_(l,w)).find(w=>Jr(w));if(!P)return[];let y=await import(Nr(P).toString());if(typeof y<"u")return console.log("Loaded "+d),console.log(y),y}let f=e==="ssr"?{preprocess:[]}:await u("svelte.config"),x=f?.preprocess?f.preprocess:[],J=!0,j=[z(t,a),Ir(),Ar({preprocess:x,compilerOptions:a})];return Ur.build({entryPoints:[r],mainFields:["svelte","browser","module","main"],bundle:!0,outfile:p,format:"esm",plugins:j}).catch(()=>{console.error(e==="csr"?"CSR Application Build Failed. Exiting.":"SSR Application Build Failed. Exiting."),process.exit(1)})}T();var pr=rr(),b=lr(pr);console.dir(pr);await k(b.entrypointSSRPath,b.vfLoaders,"ssr");await k(b.entrypointCSRPath,b.vfLoaders,"csr");U();
 //# sourceMappingURL=dxsvelte-compiler.js.map
