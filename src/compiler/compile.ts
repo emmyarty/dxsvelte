@@ -20,7 +20,7 @@ function svelteDataResolver(): Plugin {
       build.onResolve({ filter: /^@page$/ }, (args) => {
         const original = posixSlash(args.importer)
         const path = `${original}.page.vf.ts`
-        console.log('Virtual @page: ', path)
+        // console.log('Virtual @page: ', path)
         return {
           path
         };

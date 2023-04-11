@@ -52,7 +52,7 @@ export function vfLoaderPlugin(loaders: StdinOptions[] = [], compileOptions: Com
     name: "virtual-file-injector",
     setup(build) {
       build.onResolve({ filter: /\.vf\.[\S]+$/ }, async (args) => {
-        console.log("VF Resolved: " + args.path);
+        // console.log("VF Resolved: " + args.path);
         return { path: args.path };
       });
       build.onLoad({ filter: /\.vf\.[\S]+$/ }, async (args) => {

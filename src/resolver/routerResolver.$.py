@@ -1,14 +1,22 @@
 #!/usr/bin/python3
 import os
 import sys
-sys.path.append(os.getcwd())
 import django
+from django.conf import settings
 from django.urls import get_resolver, URLPattern, URLResolver
 from django.urls.resolvers import RoutePattern
 import json
 import re
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', '{{app_name}}.settings')
+sys.path.append(os.getcwd())
+
+with open('manage.py', 'r') as f:
+    manage_py_content = f.read()
+
+pattern = r"os\.environ\.setdefault\(['\"]DJANGO_SETTINGS_MODULE['\"]\s*,\s*(['\"].+['\"])"
+match = re.search(pattern, manage_py_content)
+project_settings = match.group(1).strip('"').strip("'")
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', project_settings)
 django.setup()
 
 def get_urls_json():

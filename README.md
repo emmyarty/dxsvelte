@@ -14,34 +14,19 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
-## Patch 0.0.21
-- **Reverted to Py Mini Racer:** Preparing to migrate the Python dependencies to its own package down the road; for now, you will need to manually add py_mini_racer to your Python requirements and ensure it's installed. SSR without NodeJS is back. You'll still need NodeJS during development, of course.
-- **Omitted HTTP Method:** This was overdue, GET is GET whether via CSR or SSR.
-- *Now in a good place to start implementing CSRF and Django forms.*
-
-## Patch 0.0.20
-- **Router Improvements:** Addressed a long-standing hole in the resolver which made it impossible to have views directly on the root path; index pages no longer need workarounds. The front-end router is now more feature complete as well, with backwards and forwards navigation through history in place.
-- **Introduced @common:** A global utilities module can now be imported anywhere in your SPA, which will expose useful objects over time. At the moment, it contains a ViewState store which returns a 'pathSatisfies' function property - useful for evaluating your links against the current page to apply your 'active' CSS classes in nav bars etc.
-- **Renamed @dxs to @page:** With the introduction of @common, it seems sensible to rename @dxs to something a bit more meaningful.
-- **Fixed newline preservation:** Dict -> JSON SSP payloads were losing their newlines; this has been addressed. There is still an outstanding issue with special characters that will be dealt with imminently.
-- **Svelte Version Update:** Updated Svelte dependency to 3.58.0.
-
-## Milestone Release 0.0.18
-- **Route Parameters:** You can now use your **\<str:something\>** values in DxSvelte routes - they work. Use them to customise your server-side props, and build out your individual views as before.
-- **CSS Generation:** CSS now builds successfully where included in the style tags, but be warned that PostCSS will still not work. For now the mixture of component styling & pre-built stylesheets has pushed the outstanding down the priority queue for now, but it is still on the list.
-- **Django Dict -> Svelte Data Passing:** SSR improved and cleaned up, more refactoring.
+## Patch 0.0.22
+- **Improved Updater:** No longer any need to manually delete, reinstall, and reupdate your package.json and tsconfig.json files. Rather than being regenerated wholesale, they are now just parsed, patched, and saved. Thank you for your patience with this.
 
 ## Features
 - **Seamless Integration:** DxSvelte integrates tightly with Django's route resolvers, allowing you to easily build SPAs with Svelte without manually connecting the dots through DRF (though you don't lose that functionality, should you need it). The whole philosophy here is that SPA functionality can and should be a 'first class citizen' in Django.
 - **Automatic SPA Generation:** You don't have to manually configure REST endpoints or manage complex API interactions. Instead, DxSvelte automatically generates the SPA for you, based on the routes defined in your Django app.
+- **Easy Server-Side Props:** When rendering a view, you may pass a dictionary as the second argument and access it via the **$data** object in your Svelte template file.
 - **Efficient Rendering:** DxSvelte uses Svelte's efficient rendering engine to deliver fast and responsive user experiences, without sacrificing the power and flexibility of Django. But not only that, DxSvelte also takes care of SSR (Server Side Rendering), so that the first page-load is already rendered when it arrives in the browser.
 - **Fast Compilation:** DxSvelte uses ESBuild (a powerful JS compiler written in Rust) under the hood to give you the best possible compile times.
 - **Incremental Adoption:** The default behaviour when it comes to navigation makes it easy to adopt the SPA incrementally. If you have an existing project you don't want to rewrite or only want for a specific portion of the site to be an SPA, then just keep going as you are; the SPA will honour any **\<a href=..\/>** tags which lead away from the SPA by checking itself against the automatically generated routing table.
 
 ## To-Do List & Known Bugs
 - **CSRF:** For the time being, you'll need to use the exemption decorator. This will be addressed in a future preview release.
-- **Node Dependency:** Down the road, the aim is to revert back to the embedded V8 runtime. For now, the target platform will need to have NodeJS installed, as well as Python.
-- **VENV Usage:** Configuration options for virtual environments aren't currently supported. Please ensure that 'python' is bound to a version which works with your version of Django so the router resolution during build can take place. This only affects the build step and will not affect how you run your server.
 - **Page Title Updates:** Will be added in the near future.
 - **CSS Generation:** PostCSS support for Tailwind etc.
 - **Type Generation (Autocomplete):** Decision TBC

@@ -4,6 +4,7 @@
     "lib": ["ES2022", "dom"],
     "allowJs": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,

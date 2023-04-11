@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var c=`# Import necessary libraries\r
+var m=`# Import necessary libraries\r
 import base64\r
 from django.http import HttpResponse\r
 from django.conf import settings\r
@@ -90,52 +90,6 @@ def render(request, data = {}):\r
     req_path = _normalise_url(resolve(request.path_info).route)\r
     rendered_output = _render(req_path, data)\r
     interpolated_output = svelte_ssr_html_wrap(rendered_output)\r
-    return HttpResponse(interpolated_output, content_type="text/html")`;var d=`{
-  "name": "{{__main}}",
-  "type": "module",
-  "scripts": {
-    "refresh": "node ./node_modules/dxsvelte/dist/dxsvelte-init.js",
-    "compile": "node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js"
-  },
-  "devDependencies": {
-    "dxsvelte": "*",
-    "@types/node": "^18.14.6",
-    "autoprefixer": "^10.4.14",
-    "esbuild": "0.17.11",
-    "esbuild-plugin-inline-import": "^1.0.1",
-    "esbuild-plugin-postcss": "^0.1.4",
-    "esbuild-svelte": "^0.7.3",
-    "js-base64": "^3.7.5",
-    "postcss": "^8.4.21",
-    "svelte": "^3.58.0",
-    "svelte-preprocess": "^5.0.3"
-  }
-}
-`;var u=`{\r
-  "compilerOptions": {\r
-    "target": "ES2022",\r
-    "lib": ["ES2022", "dom"],\r
-    "allowJs": true,\r
-    "skipLibCheck": true,\r
-    "esModuleInterop": true,\r
-    "allowSyntheticDefaultImports": true,\r
-    "strict": true,\r
-    "forceConsistentCasingInFileNames": true,\r
-    "noFallthroughCasesInSwitch": true,\r
-    "module": "ES2022",\r
-    "moduleResolution": "node",\r
-    "noEmit": true,\r
-    "baseUrl": ".",\r
-    "paths": {\r
-      "@main/*": ["{{__main}}/*"]\r
-    }\r
-  },\r
-  "ts-node": {\r
-    "esm": true,\r
-    "experimentalSpecifierResolution": "node"\r
-  },\r
-  "types": ["node"]\r
-}\r
-`;import{existsSync as y,writeFileSync as E}from"fs";import{existsSync as g,mkdirSync as q,readdirSync as L,readFileSync as v,rmSync as D,unlinkSync as M}from"fs";import{join as i,resolve as S}from"path";import*as l from"url";var x="__svcache__";var r=S(process.cwd()),I=l.fileURLToPath(import.meta.url),F=l.fileURLToPath(new URL(".",import.meta.url)),J=i(r,x),j=g(i(r,"manage.py"));j||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${r} is a Django project directory. Continuing.`);var A=m(),a=m(),H=i(r,a);function m(){let e=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,n=v(i(r,"manage.py"),"utf8").match(e)??[],s=n?.length>3?n[3]:"";if(s==="")throw new Error("Could not extract settings from manage.py. Exiting.");return s.split(".")[0]}import{readFileSync as U}from"fs";import{resolve as G}from"path";import{compile as V}from"svelte/compiler";function f(e,t){return Object.keys(e).forEach(n=>{let s=new RegExp(`{{${n}}}`,"g"),o=new RegExp(`{{!${n}}}`,"g");t=t.replace(s,e[n]),t=t.replace(o,`{{${n}}}`)}),t}import{join as _}from"path";function O(e){let t=_(r,e);return y(t)}function R(e){return _(r,e)}function p(e,t,n={}){function s(o){console.error(`Could not install ${o}. If the file already exists from a previous init, ignore this error.`)}if(O(e))s(e);else try{let o=f(n,t);E(R(e),o)}catch{s(e)}}function h(){p("dxsvelte.py",c),p("package.json",d,{__main:a}),p("tsconfig.json",u,{__main:a})}h();console.log(`DxSvelte initialisation completed. Remember to run npm i in order to install local dependencies and
+    return HttpResponse(interpolated_output, content_type="text/html")`;import{accessSync as D,readFileSync as g,writeFileSync as d}from"fs";import{existsSync as S,mkdirSync as q,readdirSync as N,readFileSync as x,rmSync as j,unlinkSync as J}from"fs";import{join as i,resolve as O}from"path";import*as c from"url";var E="__svcache__";var s=O(process.cwd()),F=c.fileURLToPath(import.meta.url),H=c.fileURLToPath(new URL(".",import.meta.url)),L=i(s,E),w=S(i(s,"manage.py"));w||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${s} is a Django project directory. Continuing.`);var G=f(),T=f(),$=i(s,T);function f(){let e=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,t=x(i(s,"manage.py"),"utf8").match(e)??[],r=t?.length>3?t[3]:"";if(r==="")throw new Error("Could not extract settings from manage.py. Exiting.");return r.split(".")[0]}import{basename as _,join as R}from"path";function o(e){return R(s,e)}function A(e){try{return D(e),!0}catch{return!1}}var a=null;function y(){if(a!==null)return a;let n=g("./manage.py","utf8").toString().match(/os\.environ\.setdefault\("DJANGO_SETTINGS_MODULE",\s*["'](.+)\.settings["']\)/);if(n){let t=n[1];return t=t.replace(/^"(.*)"$/,"$1"),t=t.replace(/^'(.*)'$/,"$1"),a=t,a}else throw new Error("DJANGO_SETTINGS_MODULE not found in manage.py.")}var l=e=>!(typeof e!="object"||Array.isArray(e)||e===null);async function h(e){try{let n=g(e,"utf8").toString(),t=JSON.parse(n);if(!l(t)){let r=_(e);throw new Error(`File ${r} is an Array. Skipping update.`)}return t}catch(n){if(A(e)){let r=_(e);throw console.error(`File ${r} is not valid. Skipping update.`),n}return{}}}function C(e){let n={target:"ES2022",allowJs:!0,skipLibCheck:!0,esModuleInterop:!0,allowSyntheticDefaultImports:!0,strict:!0,forceConsistentCasingInFileNames:!0,noFallthroughCasesInSwitch:!0,module:"ES2022",moduleResolution:"node",noEmit:!0,baseUrl:"."},t={"@main/*":[y()+"/*"]},r=[];return l(e.compilerOptions)||(e.compilerOptions={}),e.compilerOptions={...e.compilerOptions,...n},typeof e.compilerOptions.lib=="string"&&(e.compilerOptions.lib=[e.compilerOptions.lib]),(typeof e.compilerOptions.lib>"u"||!Array.isArray(e.compilerOptions.lib))&&(e.compilerOptions.lib=[]),e.compilerOptions.lib.includes("ES2022")||e.compilerOptions.lib.push("ES2022"),e.compilerOptions.lib.includes("dom")||e.compilerOptions.lib.push("dom"),typeof e.compilerOptions.paths>"u"&&(e.compilerOptions.paths={}),e.compilerOptions.paths={...e.compilerOptions.paths,...t},r.map(p=>e.compilerOptions.paths[p]?delete e.compilerOptions.paths[p]:null),typeof e.types>"u"&&(e.types=[]),typeof e.types=="string"&&(e.types=[e.types]),e.types.includes("node")||e.types.push("node"),e}function k(e){let n={name:y(),type:"module"},t={refresh:"node ./node_modules/dxsvelte/dist/dxsvelte-init.js",compile:"node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js"},r={dxsvelte:"*","@types/node":"^18.14.6",autoprefixer:"^10.4.14",esbuild:"0.17.11","esbuild-plugin-inline-import":"^1.0.1","esbuild-plugin-postcss":"^0.1.4","esbuild-svelte":"^0.7.3","js-base64":"^3.7.5",postcss:"^8.4.21",svelte:"^3.58.0","svelte-preprocess":"^5.0.3"};return e={...e,...n},l(e.scripts)||(e.scripts={}),e.scripts={...e.scripts,...t},l(e.devDependencies)||(e.devDependencies={}),e.devDependencies={...e.devDependencies,...r},e}var u={dxsvelte:async()=>{let e=()=>console.error("Could not install dxsvelte.py. If the file already exists from a previous init, ignore this error."),n=o("dxsvelte.py");try{d(n,m)}catch{return e(),!1}return!0},package:async()=>{let e=o("package.json"),n=await h(o(e)),t=k(n);return d("./package.json",JSON.stringify(t,null,4)),!0},tsconfig:async()=>{let e=o("tsconfig.json"),n=await h(e),t=C(n);return d("./tsconfig.json",JSON.stringify(t,null,4)),!0}};async function v(){try{if((await Promise.all([u.package(),u.tsconfig(),u.dxsvelte()])).includes(!1))throw new Error("Some or all files could not be updated.");return!0}catch(e){return console.error("Update Failed.",e),!1}}v();console.log(`DxSvelte initialisation completed. Remember to run npm i in order to install local dependencies and
 update your .gitignore to exclude node_modules`);
 //# sourceMappingURL=dxsvelte-init.js.map
