@@ -51,10 +51,7 @@ def get_urls_json():
             return None
         
     def has_static_view_decorator(func):
-        for obj in inspect.getmembers(func):
-            if hasattr(obj[1], '__name__') and (obj[1].__name__ == 'static_view' or obj[1].__name__ == 'dxsvelte.static_view'):
-                return True
-        return False
+        return hasattr(func, 'is_static_view') and func.is_static_view
 
     def convert_url_pattern(pattern):
         if hasattr(pattern, 'url_patterns'):

@@ -14,6 +14,9 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
+## Patch 0.0.24
+- **Static Views:** You can now decorate your view handlers with @static_view if you know the view will never receive any server-side props. This will mean that particular view will work offline once the app is already loaded, reducing the burden on your server.
+
 ## Patch 0.0.23
 - **Improved Updater:** No longer any need to manually delete, reinstall, and reupdate your package.json and tsconfig.json files. Rather than being regenerated wholesale, they are now just parsed, patched, and saved. Thank you for your patience with this.
 - **Compiling Triggers Restarts:** Recompiling your SPA while Django is running will now automatically trigger a restart of your dev server.

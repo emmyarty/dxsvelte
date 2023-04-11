@@ -8,6 +8,14 @@ import json
 from py_mini_racer import MiniRacer
 from django.middleware.csrf import get_token # Currently unused, on the to-do list
 
+# Add @static_view decorator - this adds an attribute to the view which is used by the
+# router resolver to mark it as a static view, mitigating some unnecessary server hits.
+def static_view(cb):
+    def middleware(req):
+        return cb(req)
+    middleware.is_static_view = True
+    return middleware
+
 # Check for existence of Svelte SSR files and set defaults if they don't exist
 project = settings.ROOT_URLCONF.split('.')[0]
 
