@@ -6,7 +6,7 @@ from django.urls import resolve
 from os.path import join, exists
 import json
 from py_mini_racer import MiniRacer
-from django.middleware.csrf import get_token # Currently unused, on the to-do list
+from django.middleware.csrf import get_token
 
 # Add @static_view decorator - this adds an attribute to the view which is used by the
 # router resolver to mark it as a static view, mitigating some unnecessary server hits.
@@ -54,31 +54,24 @@ def _normalise_url(url):
     url = "/" + url.lstrip("/")
     return url
 
-# Newline escaping, in abeyance as no longer needed
-class JSONEncoderEscaped(json.JSONEncoder):
-    def encode(self, obj):
-        json_string = super().encode(obj)
-        return json_string.replace('\n', '\\n')
+def _urlencode(input):
+    encoded_input = base64.b64encode(input.encode('utf-8')).decode('utf-8')
+    encoded_input_urlsafe = encoded_input.replace('+', '-').replace('/', '_')
+    return encoded_input_urlsafe
 
 # Process the render request given a path and payload
-def _render(req_path, data = {}):
+def _render(SSRPATH, csrf_token, data = {}):
     ctx = MiniRacer()
     json_data = json.dumps(data)
-    encoded_data = base64.b64encode(json_data.encode('utf-8')).decode('utf-8')
-    encoded_str = encoded_data.replace('+', '-').replace('/', '_')
-    set_consts = f"const SSRPATH='{req_path}'; const SSRJSON='{encoded_str}';"    
+    SSRJSON = _urlencode(json_data)
+    SSRCSRF = _urlencode(csrf_token)
+    set_consts = f"const SSRPATH='{SSRPATH}'; const SSRJSON='{SSRJSON}'; const SSRCSRF='{SSRCSRF}';"    
     ctx.eval(set_consts)
     ctx.eval(svelte_ssr_js_utf8)
     resultString = ctx.eval("result")
     resultJson = json.loads(resultString)
     result = resultJson["html"]
     return result
-
-# Add headers and create the response
-def _send(request, data, mime):
-    response = HttpResponse(data, content_type=mime)
-    response.set_cookie(key='X-CSRFToken', value=get_token(request), httponly=True)
-    return response
 
 # Define gets and posts more tidily in the views.py, will likely be removed in future
 def route(request, get, post):
@@ -89,11 +82,12 @@ def route(request, get, post):
 
 # Handle the incoming request
 def render(request, data = {}):
+    csrf_token = get_token(request)
     # This is a variant of 'GET' to serve the SPA fetches
     if 'HTTP_X_DXS_METHOD' in request.META and request.META['HTTP_X_DXS_METHOD'] == 'GET':
         data_json = json.dumps(data)
         return HttpResponse(data_json, content_type="application/json")
     req_path = _normalise_url(resolve(request.path_info).route)
-    rendered_output = _render(req_path, data)
+    rendered_output = _render(req_path, csrf_token, data)
     interpolated_output = svelte_ssr_html_wrap(rendered_output)
     return HttpResponse(interpolated_output, content_type="text/html")

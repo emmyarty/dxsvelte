@@ -14,24 +14,23 @@
 
 DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
 
-## Patch 0.0.24
-- **Static Views:** You can now decorate your view handlers with @static_view if you know the view will never receive any server-side props. This will mean that particular view will work offline once the app is already loaded, reducing the burden on your server.
-
-## Patch 0.0.23
-- **Improved Updater:** No longer any need to manually delete, reinstall, and reupdate your package.json and tsconfig.json files. Rather than being regenerated wholesale, they are now just parsed, patched, and saved. Thank you for your patience with this.
+## 🎉 Milestone Release 0.1.0
+With enough core features now in place, the work immediately on the horizon is going to be a slight refactoring in order to accommodate future changes, bugfixing as and when they're found, and some proper documentation - hosted on a DxSvelte app, of course. Recent feature upgrades:
+- **Static Views:** You can now decorate your view handlers with **@static_view** if you know the view will never receive any server-side props. This will mean that particular view will work offline once the app is already loaded, reducing the burden on your server.
+- **Forms Support:** By importing and using the **FormSetup** constructor function from **@common** in your Svelte components, you can turn your traditional form post into a reactive one with hardly any boilerplate, and pass in a callback to handle the response.
+- **CSRF Tokens:** This is taken care of by default if you're using FormSetup, but if you're constructing your own POST requests and just need to obtain a headers object with the key value pair to either use or spread into a different header, import and use **getCsrfTokenHeader()** from **@common**. The token itself is passed to the SPA during SSR.
+- **Improved Updater:** No longer any need to manually delete, reinstall, and reupdate your package.json and tsconfig.json files. Rather than being regenerated wholesale, they are now just parsed, patched, and saved. Your patience with this has been appreciated, but it's over now.
 - **Compiling Triggers Restarts:** Recompiling your SPA while Django is running will now automatically trigger a restart of your dev server.
-- **Enforce UTF-8:** Python would sometimes incorrectly infer the character encoding of compiled outputs, which would cause start failures, usually a result of minifaction. While the resulting SPA still wouldn't be compatible with the runtime, it will no longer cause Python to crash at launch, saving the user the effort of having to manually delete the 'corrupt' SSR JS application prior to recompilation.
 
 ## Features
 - **Seamless Integration:** DxSvelte integrates tightly with Django's route resolvers, allowing you to easily build SPAs with Svelte without manually connecting the dots through DRF (though you don't lose that functionality, should you need it). The whole philosophy here is that SPA functionality can and should be a 'first class citizen' in Django.
 - **Automatic SPA Generation:** You don't have to manually configure REST endpoints or manage complex API interactions. Instead, DxSvelte automatically generates the SPA for you, based on the routes defined in your Django app.
 - **Easy Server-Side Props:** When rendering a view, you may pass a dictionary as the second argument and access it via the **$data** object in your Svelte template file.
-- **Efficient Rendering:** DxSvelte uses Svelte's efficient rendering engine to deliver fast and responsive user experiences, without sacrificing the power and flexibility of Django. But not only that, DxSvelte also takes care of SSR (Server Side Rendering), so that the first page-load is already rendered when it arrives in the browser.
+- **Server Side Rendering (SSR):** DxSvelte uses Svelte's efficient rendering engine to deliver fast and responsive user experiences, without sacrificing the power and flexibility of Django. But not only that, DxSvelte also takes care of SSR (Server Side Rendering), so that the first page-load is already rendered when it arrives in the browser.
 - **Fast Compilation:** DxSvelte uses ESBuild (a powerful JS compiler written in Rust) under the hood to give you the best possible compile times.
 - **Incremental Adoption:** The default behaviour when it comes to navigation makes it easy to adopt the SPA incrementally. If you have an existing project you don't want to rewrite or only want for a specific portion of the site to be an SPA, then just keep going as you are; the SPA will honour any **\<a href=..\/>** tags which lead away from the SPA by checking itself against the automatically generated routing table.
 
 ## To-Do List & Known Bugs
-- **CSRF:** For the time being, you'll need to use the exemption decorator. This will be addressed in a future preview release.
 - **Page Title Updates:** Will be added in the near future.
 - **CSS Generation:** PostCSS support for Tailwind etc.
 - **Type Generation (Autocomplete):** Decision TBC

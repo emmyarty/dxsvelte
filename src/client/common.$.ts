@@ -25,7 +25,7 @@ interface XCSRFToken {
     'X-CSRFToken'?: string;
 }
 
-function getCsrfToken (): XCSRFToken {
+export function getCsrfTokenHeader (): XCSRFToken {
     if (typeof window !== "undefined" && typeof window['X-CSRFToken'] === "string") {
         return { 'X-CSRFToken': window['X-CSRFToken'] }
     }
@@ -34,7 +34,7 @@ function getCsrfToken (): XCSRFToken {
 
 export function FormSetup (endpoint: string, callback: Callback = async (data: any[]) => null) {
     async function post (formData: FormData) {
-        const headers = getCsrfToken()
+        const headers = getCsrfTokenHeader()
         const opts: any = {
             headers,
             method: 'POST',
@@ -52,7 +52,5 @@ export function FormSetup (endpoint: string, callback: Callback = async (data: a
         node.addEventListener('submit', handler);
     }
 }
-
-export const post = async () => null
 
 export default { ViewState }
