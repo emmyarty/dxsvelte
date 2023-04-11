@@ -4,6 +4,7 @@ export interface Pattern {
   pattern: string | any;
   lookup_str?: string | null;
   callback?: string | null;
+  static_view: boolean;
 }
 
 export interface Resolver {
@@ -19,6 +20,7 @@ export interface Route {
   app: string;
   path: string;
   view: string | null;
+  static: boolean;
   component: string | null;
   filename: string | null;
 }

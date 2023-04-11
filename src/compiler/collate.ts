@@ -70,10 +70,10 @@ export function constructCompiler(router: Route[]) {
   const svelteComponentsIfs = svelteComponentsIfsArr.join("\n");
 
   // Router Imports
-  const strRouterArray = JSON.stringify(router.map((route) => route.path));
+  const strRouterArrayOfObjects = JSON.stringify(router.map((route) => { return { path: route.path, static: route.static } }));
   const fnameRouter = posixSlash(join(__maindir, "router.vf.ts"));
   const configuredRouter = injectOptionsIntoString(
-    { router: strRouterArray },
+    { strRouterArrayOfObjects },
     routerDefault as unknown as string
   );
   injectFile(fnameRouter, configuredRouter);

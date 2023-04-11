@@ -26,7 +26,6 @@ try {
     const paddedBase64String = padding ? base64JsonString + '='.repeat(4 - padding) : base64JsonString;
     const jsonString = atob(paddedBase64String, 'base64');
     try {
-      console.log(jsonString)
       return JSON.parse(jsonString);
     } catch (err) {
       console.error(err);

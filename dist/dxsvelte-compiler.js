@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var C=`#!/usr/bin/python3\r
+import functools\r
+import inspect\r
 import os\r
 import sys\r
 import django\r
@@ -49,6 +51,12 @@ def get_urls_json():\r
             return url_resolver.url_patterns[0].lookup_str.split('.')[0]\r
         else:\r
             return None\r
+        \r
+    def has_static_view_decorator(func):\r
+        for obj in inspect.getmembers(func):\r
+            if hasattr(obj[1], '__name__') and (obj[1].__name__ == 'static_view' or obj[1].__name__ == 'dxsvelte.static_view'):\r
+                return True\r
+        return False\r
 \r
     def convert_url_pattern(pattern):\r
         if hasattr(pattern, 'url_patterns'):\r
@@ -68,7 +76,8 @@ def get_urls_json():\r
                 'pattern': pattern.pattern,\r
                 'name': pattern.name,\r
                 'lookup_str': pattern.lookup_str,\r
-                'callback': strip_prefix(pattern.callback)\r
+                'callback': strip_prefix(pattern.callback),\r
+                'static_view': has_static_view_decorator(pattern.callback)\r
             }\r
 \r
     for pattern in resolver.url_patterns:\r
@@ -85,7 +94,7 @@ with open('./{{cache}}/routerResolver.json', 'w') as file:\r
 \r
 #+DEBUG+#\r
 print(output)\r
-#+DEBUG+#`;import{join as X}from"path";import{existsSync as F,mkdirSync as hr,readdirSync as B,readFileSync as gr,rmSync as Sr,unlinkSync as V}from"fs";import{join as S,resolve as vr}from"path";import*as L from"url";var E="__svcache__",yr="python",l=vr(process.cwd()),wr=L.fileURLToPath(import.meta.url),_r=L.fileURLToPath(new URL(".",import.meta.url)),i=S(l,E),xr=F(S(l,"manage.py"));xr||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${l} is a Django project directory. Continuing.`);var T=W(),G=W(),h=S(l,G);function W(){let r=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,e=gr(S(l,"manage.py"),"utf8").match(r)??[],n=e?.length>3?e[3]:"";if(n==="")throw new Error("Could not extract settings from manage.py. Exiting.");return n.split(".")[0]}function $(){F(i)?B(i).forEach(t=>{let e=S(i,t);V(e)}):hr(i,{recursive:!0})}function U(){B(i).forEach(t=>{let e=S(i,t);V(e)}),Sr(i,{recursive:!0,force:!0}),console.log(`Cleaned ${E} artefacts.`)}var A={app_name:T,cache:E,pythonCmd:yr,__basedir:l,__filename:wr,__dirname:_r,__cache:i,__main:G,__maindir:h,prepareSvCache:$,cleanSvCache:U};import{writeFileSync as Pr}from"fs";function Rr(r){return r&&r.replace(/\\/g,"/")}function br(r,t){if(t.length<2)throw new Error(`${t} is not a valid component file.`);let e=`${t.slice(1)}.svelte`;return Rr(X(l,r,"views",e))}function jr(r){return r.length<2?r:r.charAt(1).toUpperCase()+r.slice(2).replace("$","")}function Or(r){if(r.length===0)return r;let t=r.charAt(0).toUpperCase();return r.length===1?t:t+r.slice(1)}function q(...r){return"/"+r.join("/").replace(/\/\/+/g,"/").replace(/^\/|\/$/g,"")}function Q(r){let t=[],e=(n,o)=>{if(o.type==="resolver"){if(!Array.isArray(o.url_patterns))return null;o.url_patterns.map(a=>{e({...o},a)})}if(o.type==="pattern"){if((!n||!n.app_path)&&(n={app_path:T,type:"resolver",prefix:""}),!n||!n.app_path||typeof o.pattern!="string"||!o.name||o.name[0]!=="$")return null;let a={app:n.app_path,path:n.prefix?q(n.prefix,o.pattern):q(o.pattern),view:o.name??null,component:o.name?Or(n.app_path)+jr(o.name):null,filename:o.name&&n.app_path?br(n.app_path,o.name):null};t.push(a)}};return Array.isArray(r)&&(r.map(n=>e(null,n)),Pr(X(i,"debugRouter.json"),JSON.stringify(t,null,2))),t}import{execSync as Lr}from"child_process";import{readFileSync as Er,writeFileSync as Tr}from"fs";import Y from"path";import{readFileSync as Yr}from"fs";import{resolve as K}from"path";import{compile as Dr}from"svelte/compiler";function m(r,t){return Object.keys(r).forEach(e=>{let n=new RegExp(`{{${e}}}`,"g"),o=new RegExp(`{{!${e}}}`,"g");t=t.replace(n,r[e]),t=t.replace(o,`{{${e}}}`)}),t}function Cr(r,t){let e=K(r);return t.find(n=>K(n.sourcefile)===e)??null}function z(r=[],t){return{name:"virtual-file-injector",setup(e){e.onResolve({filter:/\.vf\.[\S]+$/},async n=>({path:n.path})),e.onLoad({filter:/\.vf\.[\S]+$/},async n=>{let o=Cr(n.path,r),a=o.contents,c=o.loader;if(c==="svelte"){let f=Dr(a,t)?.js?.code??null;if(!f)throw new Error("Compilation Failed for: "+n.path);return{contents:f,loader:"js"}}return{contents:a,loader:c}})}}}var{__cache:Z,app_name:$r,cache:Ur}=A;function rr(){console.log("Getting router...");function r(a,c){let u=new RegExp(`#\\+${c}\\+#([\\s\\S]*?)#\\+${c}\\+#`,"gm"),f=new RegExp("#\\+([\\S]*?)\\+#","gm");return a=a.replace(u,""),a=a.replace(f,""),a}let t;t=process.env.NODE_ENV==="debug"?r(C,"OPERATIONAL"):r(C,"DEBUG"),t=m({app_name:$r,cache:Ur},t);function e(){let a=Y.join(Z,"tmp"),c=Y.join(Z,"routerResolver.json");try{Tr(a,t),Lr(`${A.pythonCmd} ${a}`);let u=Er(c,"utf8");return JSON.parse(u)}catch(u){throw console.error(u),new Error("Could Not Load Django Router Object")}}let n=e();return Q(n)}var tr="<slot/>";var er=`<script>\r
+#+DEBUG+#`;import{join as X}from"path";import{existsSync as M,mkdirSync as hr,readdirSync as B,readFileSync as gr,rmSync as Sr,unlinkSync as V}from"fs";import{join as S,resolve as vr}from"path";import*as L from"url";var E="__svcache__",yr="python",l=vr(process.cwd()),wr=L.fileURLToPath(import.meta.url),_r=L.fileURLToPath(new URL(".",import.meta.url)),i=S(l,E),br=M(S(l,"manage.py"));br||(console.error("This script must be run from the Django project's root directory. Exiting."),process.exit(1));console.log(`${l} is a Django project directory. Continuing.`);var T=W(),G=W(),h=S(l,G);function W(){let r=/os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/,e=gr(S(l,"manage.py"),"utf8").match(r)??[],n=e?.length>3?e[3]:"";if(n==="")throw new Error("Could not extract settings from manage.py. Exiting.");return n.split(".")[0]}function $(){M(i)?B(i).forEach(t=>{let e=S(i,t);V(e)}):hr(i,{recursive:!0})}function U(){B(i).forEach(t=>{let e=S(i,t);V(e)}),Sr(i,{recursive:!0,force:!0}),console.log(`Cleaned ${E} artefacts.`)}var A={app_name:T,cache:E,pythonCmd:yr,__basedir:l,__filename:wr,__dirname:_r,__cache:i,__main:G,__maindir:h,prepareSvCache:$,cleanSvCache:U};import{writeFileSync as Rr}from"fs";function xr(r){return r&&r.replace(/\\/g,"/")}function Pr(r,t){if(t.length<2)throw new Error(`${t} is not a valid component file.`);let e=`${t.slice(1)}.svelte`;return xr(X(l,r,"views",e))}function jr(r){return r.length<2?r:r.charAt(1).toUpperCase()+r.slice(2).replace("$","")}function Or(r){if(r.length===0)return r;let t=r.charAt(0).toUpperCase();return r.length===1?t:t+r.slice(1)}function q(...r){return"/"+r.join("/").replace(/\/\/+/g,"/").replace(/^\/|\/$/g,"")}function Q(r){let t=[],e=(n,o)=>{if(o.type==="resolver"){if(!Array.isArray(o.url_patterns))return null;o.url_patterns.map(a=>{e({...o},a)})}if(o.type==="pattern"){if((!n||!n.app_path)&&(n={app_path:T,type:"resolver",prefix:""}),!n||!n.app_path||typeof o.pattern!="string"||!o.name||o.name[0]!=="$")return null;let a={app:n.app_path,path:n.prefix?q(n.prefix,o.pattern):q(o.pattern),view:o.name??null,static:o.static_view,component:o.name?Or(n.app_path)+jr(o.name):null,filename:o.name&&n.app_path?Pr(n.app_path,o.name):null};t.push(a)}};return Array.isArray(r)&&(r.map(n=>e(null,n)),Rr(X(i,"debugRouter.json"),JSON.stringify(t,null,2))),t}import{execSync as Lr}from"child_process";import{readFileSync as Er,writeFileSync as Tr}from"fs";import Y from"path";import{readFileSync as Yr}from"fs";import{resolve as K}from"path";import{compile as Dr}from"svelte/compiler";function m(r,t){return Object.keys(r).forEach(e=>{let n=new RegExp(`{{${e}}}`,"g"),o=new RegExp(`{{!${e}}}`,"g");t=t.replace(n,r[e]),t=t.replace(o,`{{${e}}}`)}),t}function Cr(r,t){let e=K(r);return t.find(n=>K(n.sourcefile)===e)??null}function z(r=[],t){return{name:"virtual-file-injector",setup(e){e.onResolve({filter:/\.vf\.[\S]+$/},async n=>({path:n.path})),e.onLoad({filter:/\.vf\.[\S]+$/},async n=>{let o=Cr(n.path,r),a=o.contents,c=o.loader;if(c==="svelte"){let f=Dr(a,t)?.js?.code??null;if(!f)throw new Error("Compilation Failed for: "+n.path);return{contents:f,loader:"js"}}return{contents:a,loader:c}})}}}var{__cache:Z,app_name:$r,cache:Ur}=A;function rr(){console.log("Getting router...");function r(a,c){let u=new RegExp(`#\\+${c}\\+#([\\s\\S]*?)#\\+${c}\\+#`,"gm"),f=new RegExp("#\\+([\\S]*?)\\+#","gm");return a=a.replace(u,""),a=a.replace(f,""),a}let t;t=process.env.NODE_ENV==="debug"?r(C,"OPERATIONAL"):r(C,"DEBUG"),t=m({app_name:$r,cache:Ur},t);function e(){let a=Y.join(Z,"tmp"),c=Y.join(Z,"routerResolver.json");try{Tr(a,t),Lr(`${A.pythonCmd} ${a}`);let u=Er(c,"utf8");return JSON.parse(u)}catch(u){throw console.error(u),new Error("Could Not Load Django Router Object")}}let n=e();return Q(n)}var tr="<slot/>";var er=`<script>\r
   import { activeViewStore, ssrHydrate, satisfiedStorePath } from "{{router}}";\r
   import { writable } from "svelte/store";\r
   {{layoutImportStatement}};\r
@@ -99,9 +108,9 @@ print(output)\r
   ssrHydrate(currentView, ssrData);\r
   activeViewStore.set({route: currentView, href: currentHref});\r
   activeViewStore.subscribe((value) => {\r
-    if (typeof window !== "undefined") {\r
-      console.log('Root component updating to: ', value)\r
-    }\r
+    // if (typeof window !== "undefined") {\r
+    //   console.log('Root component updating to: ', value)\r
+    // }\r
     const reload = (currentHref !== value.href)\r
     currentView = value.route;\r
     currentHref = value.href;\r
@@ -141,7 +150,6 @@ try {\r
     const paddedBase64String = padding ? base64JsonString + '='.repeat(4 - padding) : base64JsonString;\r
     const jsonString = atob(paddedBase64String, 'base64');\r
     try {\r
-      console.log(jsonString)\r
       return JSON.parse(jsonString);\r
     } catch (err) {\r
       console.error(err);\r
@@ -229,15 +237,21 @@ export const activeViewStore = writable({\r
 });\r
 \r
 // The path as the key and the component is the value. This will be interpolated with a JSON representation of the routes.\r
-export const routes = JSON.parse(\`{{router}}\`) as string[];\r
+interface RoutePathStatic {\r
+  path: string,\r
+  static: boolean\r
+}\r
+export const routes = JSON.parse(\`{{strRouterArrayOfObjects}}\`) as RoutePathStatic[];\r
 \r
 class ServerDataStore {\r
   storePath: string;\r
   data: Writable<any>;\r
   stale: boolean;\r
-  constructor(storePath: string, data: any = {}, stale = true) {\r
+  static: boolean;\r
+  constructor(storePath: string, data: any = {}, static_view: boolean = false, stale = true) {\r
     this.storePath = storePath;\r
     this.stale = stale;\r
+    this.static = static_view;\r
     const getInitialPayload = () => {\r
       if (\r
         typeof window !== "undefined" &&\r
@@ -273,7 +287,7 @@ class ServerDataStore {\r
       const resultRaw = await fetch(loc, reqOptions);\r
       const resultJson = await resultRaw.json();\r
       this.data.set(resultJson);\r
-    console.info("DXS GET Result: ", resultJson);\r
+    // console.info("DXS GET Result: ", resultJson);\r
     } catch (err) {\r
       console.error("Server Request Failed - Contact Site Administrator.");\r
     }\r
@@ -344,12 +358,12 @@ export function ssrHydrate(thisPath: string, payload: any) {\r
 }\r
 \r
 routes.map((route) => {\r
-  serverDataStore[route] = new ServerDataStore(route)\r
+  serverDataStore[route.path] = new ServerDataStore(route.path, {}, route.static)\r
 });\r
 \r
 function refreshServerStore(targetStorePath: string) {\r
   const fetchedStore = Object.values(serverDataStore).find(dataStore => dataStore.satisfiedBy(targetStorePath))\r
-  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object') return null\r
+  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object' || fetchedStore.static === true) return null\r
   return fetchedStore.fetch(targetStorePath);\r
 }\r
 \r
@@ -416,7 +430,8 @@ if (\r
     // We need to safely handle events where the URL change is only a hash change before proceeding.\r
     const href = target.getAttribute("href");\r
     if (typeof href === "string" && isHashChange(href, window.location.href)) {\r
-      return console.log("Hash change detected.")\r
+      return null\r
+      // return console.log("Hash change detected.")\r
     }\r
     e.preventDefault();\r
     if (typeof href !== "string") {\r
@@ -439,7 +454,6 @@ if (\r
   window.addEventListener('popstate', (event: PopStateEvent) => {\r
     event.preventDefault();\r
     const navTo = (event.target as Window)?.location?.href ?? '';\r
-    console.log('Pop state: ', navTo)\r
     goto(navTo, true)();\r
   });\r
 }\r
@@ -472,7 +486,7 @@ viewStore.subscribe(value => {\r
     ViewState.set({ pathSatisfies: (pathToTest: string) => onlyPath(pathToTest) === value.href })\r
 })\r
 \r
-export default { ViewState }`;import{existsSync as Ar}from"fs";function p(r){return r&&r.replace(/\\/g,"/")}import{join as g}from"path";function lr(r){let t=[];function e(s,O){let P=s.split("."),D=P[P.length-1],dr={contents:O,sourcefile:s,loader:D};t.push(dr)}let n=p(g(h,"layout.svelte"));Ar(n)||(n=p(g(h,"layout.vf.svelte")),e(n,tr));let o=p(g(i,"root.vf.svelte")),a=`import Layout from '${n}'`,c=s=>`import ${s.component} from '${s.filename}'`,u=s=>`{#each trigger as instance}{#if satisfiedStorePath(currentView) === '${s.path}'}<${s.component}></${s.component}>{/if}{/each}`,f=r.map(s=>c(s)),b=r.map(s=>u(s)),J=f.join(`
-`),j=b.join(`
-`),d=JSON.stringify(r.map(s=>s.path)),v=p(g(h,"router.vf.ts")),k=m({router:d},ar);e(v,k);let x=m({router:v,layoutImportStatement:a,svelteComponentImports:J,svelteComponentsIfs:j},er),I=s=>{let O={path:s.path,fnameRouter:v},P=m(O,sr),D=`${s.filename}.page.vf.ts`;e(D,P)};r.map(s=>I(s));let y=p(g(i,"common.vf.ts")),w=m({fnameRouter:v},ir);e(y,w);let fr=m({App:o},nr),mr=m({App:o},or),H=`${p(g(i,"ssr.vf.js"))}`,M=`${p(g(i,"csr.vf.js"))}`;return e(o,x),e(H,fr),e(M,mr),{vfLoaders:t,entrypointSSRPath:H,entrypointCSRPath:M}}import Nr from"esbuild";import Jr from"esbuild-svelte";import{join as _}from"path";import{mkdirSync as kr,existsSync as Ir}from"fs";import{pathToFileURL as Hr}from"url";function Mr(){return{name:"svelte-data-resolver",setup(r){r.onResolve({filter:/^@page$/},t=>({path:`${p(t.importer)}.page.vf.ts`})),r.onResolve({filter:/^@common$/},()=>({path:p(_(i,"common.vf.ts"))}))}}}async function N(r,t,e){console.log("Compiling...",e,r);let a=e==="ssr"?{generate:"ssr",dev:!1,hydratable:!0,format:"esm",css:!0}:{generate:"dom",dev:!1,format:"esm"};try{kr(_(l,"static"))}catch{}let c=e==="ssr"?_(h,"svelte.ssr.js"):_(l,"static","svelte.csr.js");async function u(d){let x=[d+".js",d+".mjs",d+".cjs"].map(w=>_(l,w)).find(w=>Ir(w));if(!x)return[];let y=await import(Hr(x).toString());if(typeof y<"u")return console.log("Loaded "+d),console.log(y),y}let f=e==="ssr"?{preprocess:[]}:await u("svelte.config"),b=f?.preprocess?f.preprocess:[],J=!0,j=[z(t,a),Mr(),Jr({preprocess:b,compilerOptions:a})];return Nr.build({entryPoints:[r],mainFields:["svelte","browser","module","main"],bundle:!0,outfile:c,format:"esm",plugins:j}).catch(()=>{console.error(e==="csr"?"CSR Application Build Failed. Exiting.":"SSR Application Build Failed. Exiting."),process.exit(1)})}import pr from"fs";import{join as Fr}from"path";function cr(){let r=p(Fr(l,"manage.py"));pr.writeFileSync(r,pr.readFileSync(r))}$();var ur=rr(),R=lr(ur);console.dir(ur);await N(R.entrypointSSRPath,R.vfLoaders,"ssr");await N(R.entrypointCSRPath,R.vfLoaders,"csr");U();cr();
+export default { ViewState }`;import{existsSync as Ar}from"fs";function p(r){return r&&r.replace(/\\/g,"/")}import{join as g}from"path";function lr(r){let t=[];function e(s,O){let R=s.split("."),D=R[R.length-1],dr={contents:O,sourcefile:s,loader:D};t.push(dr)}let n=p(g(h,"layout.svelte"));Ar(n)||(n=p(g(h,"layout.vf.svelte")),e(n,tr));let o=p(g(i,"root.vf.svelte")),a=`import Layout from '${n}'`,c=s=>`import ${s.component} from '${s.filename}'`,u=s=>`{#each trigger as instance}{#if satisfiedStorePath(currentView) === '${s.path}'}<${s.component}></${s.component}>{/if}{/each}`,f=r.map(s=>c(s)),P=r.map(s=>u(s)),k=f.join(`
+`),j=P.join(`
+`),d=JSON.stringify(r.map(s=>({path:s.path,static:s.static}))),v=p(g(h,"router.vf.ts")),J=m({strRouterArrayOfObjects:d},ar);e(v,J);let b=m({router:v,layoutImportStatement:a,svelteComponentImports:k,svelteComponentsIfs:j},er),I=s=>{let O={path:s.path,fnameRouter:v},R=m(O,sr),D=`${s.filename}.page.vf.ts`;e(D,R)};r.map(s=>I(s));let y=p(g(i,"common.vf.ts")),w=m({fnameRouter:v},ir);e(y,w);let fr=m({App:o},nr),mr=m({App:o},or),H=`${p(g(i,"ssr.vf.js"))}`,F=`${p(g(i,"csr.vf.js"))}`;return e(o,b),e(H,fr),e(F,mr),{vfLoaders:t,entrypointSSRPath:H,entrypointCSRPath:F}}import Nr from"esbuild";import kr from"esbuild-svelte";import{join as _}from"path";import{mkdirSync as Jr,existsSync as Ir}from"fs";import{pathToFileURL as Hr}from"url";function Fr(){return{name:"svelte-data-resolver",setup(r){r.onResolve({filter:/^@page$/},t=>({path:`${p(t.importer)}.page.vf.ts`})),r.onResolve({filter:/^@common$/},()=>({path:p(_(i,"common.vf.ts"))}))}}}async function N(r,t,e){console.log("Compiling...",e,r);let a=e==="ssr"?{generate:"ssr",dev:!1,hydratable:!0,format:"esm",css:!0}:{generate:"dom",dev:!1,format:"esm"};try{Jr(_(l,"static"))}catch{}let c=e==="ssr"?_(h,"svelte.ssr.js"):_(l,"static","svelte.csr.js");async function u(d){let b=[d+".js",d+".mjs",d+".cjs"].map(w=>_(l,w)).find(w=>Ir(w));if(!b)return[];let y=await import(Hr(b).toString());if(typeof y<"u")return console.log("Loaded "+d),console.log(y),y}let f=e==="ssr"?{preprocess:[]}:await u("svelte.config"),P=f?.preprocess?f.preprocess:[],k=!0,j=[z(t,a),Fr(),kr({preprocess:P,compilerOptions:a})];return Nr.build({entryPoints:[r],mainFields:["svelte","browser","module","main"],bundle:!0,outfile:c,format:"esm",plugins:j}).catch(()=>{console.error(e==="csr"?"CSR Application Build Failed. Exiting.":"SSR Application Build Failed. Exiting."),process.exit(1)})}import pr from"fs";import{join as Mr}from"path";function cr(){let r=p(Mr(l,"manage.py"));pr.writeFileSync(r,pr.readFileSync(r))}$();var ur=rr(),x=lr(ur);console.dir(ur);await N(x.entrypointSSRPath,x.vfLoaders,"ssr");await N(x.entrypointCSRPath,x.vfLoaders,"csr");U();cr();
 //# sourceMappingURL=dxsvelte-compiler.js.map

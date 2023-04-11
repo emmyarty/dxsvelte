@@ -42,15 +42,21 @@ export const activeViewStore = writable({
 });
 
 // The path as the key and the component is the value. This will be interpolated with a JSON representation of the routes.
-export const routes = JSON.parse(`{{router}}`) as string[];
+interface RoutePathStatic {
+  path: string,
+  static: boolean
+}
+export const routes = JSON.parse(`{{strRouterArrayOfObjects}}`) as RoutePathStatic[];
 
 class ServerDataStore {
   storePath: string;
   data: Writable<any>;
   stale: boolean;
-  constructor(storePath: string, data: any = {}, stale = true) {
+  static: boolean;
+  constructor(storePath: string, data: any = {}, static_view: boolean = false, stale = true) {
     this.storePath = storePath;
     this.stale = stale;
+    this.static = static_view;
     const getInitialPayload = () => {
       if (
         typeof window !== "undefined" &&
@@ -86,7 +92,7 @@ class ServerDataStore {
       const resultRaw = await fetch(loc, reqOptions);
       const resultJson = await resultRaw.json();
       this.data.set(resultJson);
-    console.info("DXS GET Result: ", resultJson);
+    // console.info("DXS GET Result: ", resultJson);
     } catch (err) {
       console.error("Server Request Failed - Contact Site Administrator.");
     }
@@ -157,12 +163,12 @@ export function ssrHydrate(thisPath: string, payload: any) {
 }
 
 routes.map((route) => {
-  serverDataStore[route] = new ServerDataStore(route)
+  serverDataStore[route.path] = new ServerDataStore(route.path, {}, route.static)
 });
 
 function refreshServerStore(targetStorePath: string) {
   const fetchedStore = Object.values(serverDataStore).find(dataStore => dataStore.satisfiedBy(targetStorePath))
-  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object') return null
+  if (typeof fetchedStore === 'undefined' || typeof fetchedStore !== 'object' || fetchedStore.static === true) return null
   return fetchedStore.fetch(targetStorePath);
 }
 
@@ -229,7 +235,8 @@ if (
     // We need to safely handle events where the URL change is only a hash change before proceeding.
     const href = target.getAttribute("href");
     if (typeof href === "string" && isHashChange(href, window.location.href)) {
-      return console.log("Hash change detected.")
+      return null
+      // return console.log("Hash change detected.")
     }
     e.preventDefault();
     if (typeof href !== "string") {
@@ -252,7 +259,6 @@ if (
   window.addEventListener('popstate', (event: PopStateEvent) => {
     event.preventDefault();
     const navTo = (event.target as Window)?.location?.href ?? '';
-    console.log('Pop state: ', navTo)
     goto(navTo, true)();
   });
 }

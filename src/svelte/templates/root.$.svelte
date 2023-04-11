@@ -12,9 +12,9 @@
   ssrHydrate(currentView, ssrData);
   activeViewStore.set({route: currentView, href: currentHref});
   activeViewStore.subscribe((value) => {
-    if (typeof window !== "undefined") {
-      console.log('Root component updating to: ', value)
-    }
+    // if (typeof window !== "undefined") {
+    //   console.log('Root component updating to: ', value)
+    // }
     const reload = (currentHref !== value.href)
     currentView = value.route;
     currentHref = value.href;

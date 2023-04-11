@@ -68,6 +68,7 @@ export function translateDjangoResolver(input: Resolver[]) {
         app: parent.app_path,
         path: (parent.prefix) ? constructPathFromSegments(parent.prefix, data.pattern) : constructPathFromSegments(data.pattern),
         view: data.name ?? null,
+        static: data.static_view,
         component: data.name
           ? capitaliseTagName(parent.app_path) +
             formatSvelteComponentTagName(data.name)

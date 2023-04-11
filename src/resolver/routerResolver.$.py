@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import functools
+import inspect
 import os
 import sys
 import django
@@ -47,6 +49,12 @@ def get_urls_json():
             return url_resolver.url_patterns[0].lookup_str.split('.')[0]
         else:
             return None
+        
+    def has_static_view_decorator(func):
+        for obj in inspect.getmembers(func):
+            if hasattr(obj[1], '__name__') and (obj[1].__name__ == 'static_view' or obj[1].__name__ == 'dxsvelte.static_view'):
+                return True
+        return False
 
     def convert_url_pattern(pattern):
         if hasattr(pattern, 'url_patterns'):
@@ -66,7 +74,8 @@ def get_urls_json():
                 'pattern': pattern.pattern,
                 'name': pattern.name,
                 'lookup_str': pattern.lookup_str,
-                'callback': strip_prefix(pattern.callback)
+                'callback': strip_prefix(pattern.callback),
+                'static_view': has_static_view_decorator(pattern.callback)
             }
 
     for pattern in resolver.url_patterns:
