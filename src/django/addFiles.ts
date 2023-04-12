@@ -129,7 +129,7 @@ function constructUpdatedPackage(obj: any) {
     compile: 'node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js'
   }
   const devDependenciesInclude = {
-    dxsvelte: '0.^1.0',
+    dxsvelte: '0.^1.1',
     '@types/node': '^18.14.6',
     autoprefixer: '^10.4.14',
     esbuild: '0.17.11',

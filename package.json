@@ -1,6 +1,6 @@
 {
   "name": "dxsvelte",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bring the power of Svelte to your Django projects.",
   "main": "dist/dxsvelte-init.js",
   "bin": {

@@ -236,7 +236,9 @@ if (
     const href = target.getAttribute("href");
     if (typeof href === "string" && isHashChange(href, window.location.href)) {
       return null
-      // return console.log("Hash change detected.")
+    }
+    if (typeof href === "string" && !isLocalURL(href)) {
+      return console.info("Following External Link")
     }
     e.preventDefault();
     if (typeof href !== "string") {

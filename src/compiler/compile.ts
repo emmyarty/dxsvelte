@@ -58,6 +58,7 @@ export async function compile(
   };
 
   const compilerOptions = ver === "ssr" ? compileOptionsSsr : compileOptionsCsr;
+  const minify = (ver === "csr");
 
   try {
     mkdirSync(join(__basedir, "static"));
@@ -106,6 +107,7 @@ export async function compile(
       outfile,
       format: "esm",
       plugins,
+      minify
     })
     .catch(() => {
       const msg =

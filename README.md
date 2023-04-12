@@ -1,5 +1,6 @@
 ![DxSvelteLogo](https://github.com/emmyarty/dxsvelte/raw/main/meta/logo-dxs-square-200.png)
 # Django x Svelte: Alpha
+
 [![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/emmyarty/dxsvelte) [![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/dxsvelte)
 
 [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://opensource.org/licenses/MIT/)
@@ -9,10 +10,16 @@
 [![Python](https://img.shields.io/badge/-Python-dd743f.svg)](#)
 [![TypeScript](https://img.shields.io/badge/-TypeScript-1f82df.svg)](#)
 
->**Warning**:
->This project is in early Alpha and key features are still under active development. Please note that, for the time being, you will need to delete the automatically generated *tsconfig.json* and *dxsvelte.py* files from your project's root directory. The current behaviour is to not overwrite these files.
+## 📔 Documentation
+The new documentation is now available to read. And it was built with DxSvelte!
 
-DxSvelte is a powerful integration package that enables you to use Svelte as a front-end framework for Django web applications. With DxSvelte, you can easily build single-page applications (SPAs) that leverage the full power of both Django and Svelte, without having to worry about REST endpoints using DRF.
+[![Documentation](https://img.shields.io/badge/Read%20It-Here-orange?&style=for-the-badge)](https://dxsvelte.com/)
+
+## 💌 Introduction
+>**Warning**:
+>This project is in early Alpha and key features are still under active development.
+
+DxSvelte is a powerful integration package that brings Svelte to your Django web applications with a simplified workflow, closer to how you would normally Render views. Enjoy the full benefit of SSR in your next single-page application (SPA).
 
 ## 🎉 Milestone Release 0.1.0
 With enough core features now in place, the work immediately on the horizon is going to be a slight refactoring in order to accommodate future changes, bugfixing as and when they're found, and some proper documentation - hosted on a DxSvelte app, of course. Recent feature upgrades:
@@ -22,7 +29,8 @@ With enough core features now in place, the work immediately on the horizon is g
 - **Improved Updater:** No longer any need to manually delete, reinstall, and reupdate your package.json and tsconfig.json files. Rather than being regenerated wholesale, they are now just parsed, patched, and saved. Your patience with this has been appreciated, but it's over now.
 - **Compiling Triggers Restarts:** Recompiling your SPA while Django is running will now automatically trigger a restart of your dev server.
 
-## Patch Release 0.1.1
+##  Patch Release 0.1.1
+- **Updated README:** Added a link to the new documentation, built with DxSvelte!
 - **Bug Fix:** Addressed an issue where history.pushState() would run and fail on external links, set the no-cache headers on JSON payloads.
 
 ## Features
