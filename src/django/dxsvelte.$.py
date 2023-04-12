@@ -86,7 +86,9 @@ def render(request, data = {}):
     # This is a variant of 'GET' to serve the SPA fetches
     if 'HTTP_X_DXS_METHOD' in request.META and request.META['HTTP_X_DXS_METHOD'] == 'GET':
         data_json = json.dumps(data)
-        return HttpResponse(data_json, content_type="application/json")
+        response = HttpResponse(data_json, content_type="application/json")
+        response['Cache-Control'] = 'no-store'
+        return response
     req_path = _normalise_url(resolve(request.path_info).route)
     rendered_output = _render(req_path, csrf_token, data)
     interpolated_output = svelte_ssr_html_wrap(rendered_output)

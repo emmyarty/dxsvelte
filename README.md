@@ -22,6 +22,9 @@ With enough core features now in place, the work immediately on the horizon is g
 - **Improved Updater:** No longer any need to manually delete, reinstall, and reupdate your package.json and tsconfig.json files. Rather than being regenerated wholesale, they are now just parsed, patched, and saved. Your patience with this has been appreciated, but it's over now.
 - **Compiling Triggers Restarts:** Recompiling your SPA while Django is running will now automatically trigger a restart of your dev server.
 
+## Patch Release 0.1.1
+- **Bug Fix:** Addressed an issue where history.pushState() would run and fail on external links, set the no-cache headers on JSON payloads.
+
 ## Features
 - **Seamless Integration:** DxSvelte integrates tightly with Django's route resolvers, allowing you to easily build SPAs with Svelte without manually connecting the dots through DRF (though you don't lose that functionality, should you need it). The whole philosophy here is that SPA functionality can and should be a 'first class citizen' in Django.
 - **Automatic SPA Generation:** You don't have to manually configure REST endpoints or manage complex API interactions. Instead, DxSvelte automatically generates the SPA for you, based on the routes defined in your Django app.
@@ -155,8 +158,6 @@ Meanwhile, in your **about.svelte** component over in the ./views directory:
 
 <button on:click={increment}>Number Goes Up</button>
 ```
-
-That's it! For now...
 
 ------------------------------
 
