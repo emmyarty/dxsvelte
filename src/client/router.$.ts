@@ -176,7 +176,7 @@ export const goto = (href: string, ignoreHistoryState: boolean = false) => {
   return async () => {
     // Guard clause to navigate to destinations not on the same host
     if (!isLocalURL(href)) {
-      return window.history.pushState({}, "", href)
+      return window.location.href = href
     }
     const thisPath = onlyPath(href);
     // Check whether the new route is within the scope of the SPA router

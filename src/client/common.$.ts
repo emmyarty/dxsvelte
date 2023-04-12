@@ -53,4 +53,4 @@ export function FormSetup (endpoint: string, callback: Callback = async (data: a
     }
 }
 
-export default { ViewState }
+export default { ViewState, getCsrfTokenHeader, FormSetup }

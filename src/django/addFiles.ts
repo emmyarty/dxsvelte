@@ -129,7 +129,7 @@ function constructUpdatedPackage(obj: any) {
     compile: 'node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js'
   }
   const devDependenciesInclude = {
-    dxsvelte: '*',
+    dxsvelte: '0.^1.0',
     '@types/node': '^18.14.6',
     autoprefixer: '^10.4.14',
     esbuild: '0.17.11',
@@ -167,7 +167,7 @@ const update = {
   },
   package: async () => {
     const fpath = getPath('package.json')
-    const file = await getExistingJson(getPath(fpath))
+    const file = await getExistingJson(fpath)
     const result = constructUpdatedPackage(file)
     writeFileSync('./package.json', JSON.stringify(result, null, 4))
     return true

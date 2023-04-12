@@ -31,6 +31,7 @@ With enough core features now in place, the work immediately on the horizon is g
 - **Incremental Adoption:** The default behaviour when it comes to navigation makes it easy to adopt the SPA incrementally. If you have an existing project you don't want to rewrite or only want for a specific portion of the site to be an SPA, then just keep going as you are; the SPA will honour any **\<a href=..\/>** tags which lead away from the SPA by checking itself against the automatically generated routing table.
 
 ## To-Do List & Known Bugs
+- **404 Errors:** Will be added in the near future.
 - **Page Title Updates:** Will be added in the near future.
 - **CSS Generation:** PostCSS support for Tailwind etc.
 - **Type Generation (Autocomplete):** Decision TBC
