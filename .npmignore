@@ -2,7 +2,7 @@ node_modules
 package-lock.json
 npm-debug.log
 update-playground.js
-.nyc
+.pyc
 .env
 .DS_Store
 src
