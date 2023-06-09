@@ -22,13 +22,13 @@ function mainDir() {
   if (_mainDir !== null) return _mainDir
   const managePyContent = readFileSync('./manage.py', 'utf8').toString()
   const match = managePyContent.match(
-    /os\.environ\.setdefault\("DJANGO_SETTINGS_MODULE",\s*["'](.+)\.settings["']\)/
+    /os\.environ\.setdefault\(\s*("DJANGO_SETTINGS_MODULE"|'DJANGO_SETTINGS_MODULE')\s*,\s*("(.+)\.settings"|'(.+)\.settings')\)/
   )
   if (match) {
-    let djangoSettingsModule = match[1]
+    let djangoSettingsModule = match[2]
     djangoSettingsModule = djangoSettingsModule.replace(/^"(.*)"$/, '$1')
     djangoSettingsModule = djangoSettingsModule.replace(/^'(.*)'$/, '$1')
-    _mainDir = djangoSettingsModule
+    _mainDir = djangoSettingsModule.split('.')[0]
     return _mainDir
   } else {
     throw new Error('DJANGO_SETTINGS_MODULE not found in manage.py.')
@@ -80,7 +80,9 @@ function constructUpdatedTsconfig(obj: any) {
   }
   // These subkeys will be added / overwritten
   const compilerOptionsPathsInclude = {
-    '@main/*': [mainDir() + '/*']
+    '@main/*': [mainDir() + '/*'],
+    "@page": ["node_modules/dxsvelte/dist/client-types/@page.ts"],
+    "@common": ["node_modules/dxsvelte/dist/client-types/@common.ts"]
   }
   // Delete superseded subkeys; for future use
   const compilerOptionsPathsOmit: any[] = []
@@ -129,7 +131,7 @@ function constructUpdatedPackage(obj: any) {
     compile: 'node ./node_modules/dxsvelte/dist/dxsvelte-compiler.js'
   }
   const devDependenciesInclude = {
-    dxsvelte: '0.^1.1',
+    dxsvelte: '0.1.x',
     '@types/node': '^18.14.6',
     autoprefixer: '^10.4.14',
     esbuild: '0.17.11',

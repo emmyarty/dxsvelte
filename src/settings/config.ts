@@ -1,10 +1,11 @@
 // import sourceMap from "source-map-support";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, unlinkSync } from "fs";
 import { join, resolve } from "path";
+import { getPythonVersion } from './pythonVersion'
 import * as url from "url";
 
 export const cache = "__svcache__";
-export const pythonCmd = "python";
+export const pythonCmd = await getPythonVersion();
 export const __basedir = resolve(process.cwd());
 export const __filename = url.fileURLToPath(import.meta.url);
 export const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
@@ -26,11 +27,11 @@ export const __maindir = join(__basedir, __main);
 
 export function getMainApp() {
   const rxFunctionString =
-    /os\.environ\.setdefault\(\s*(['\"`])DJANGO_SETTINGS_MODULE\1\s*,\s*\s*(['\"`])(.+?)\2\s*\)/;
+    /os\.environ\.setdefault\(\s*("DJANGO_SETTINGS_MODULE"|'DJANGO_SETTINGS_MODULE')\s*,\s*("(.+)\.settings"|'(.+)\.settings')\)/;
   const settingsStr = readFileSync(join(__basedir, "manage.py"), "utf8");
   const settingsStrExtract = settingsStr.match(rxFunctionString) ?? [];
   const settingsModuleExtract =
-    settingsStrExtract?.length > 3 ? settingsStrExtract[3] : "";
+    settingsStrExtract?.length > 3 ? settingsStrExtract[2].replaceAll('"',"").replaceAll("'","") : "";
   if (settingsModuleExtract === "") {
     throw new Error("Could not extract settings from manage.py. Exiting.");
   }
