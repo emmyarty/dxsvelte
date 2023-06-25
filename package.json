@@ -1,6 +1,6 @@
 {
   "name": "dxsvelte",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.1",
   "description": "Bring the power of Svelte to your Django projects.",
   "homepage": "https://dxsvelte.com/",
   "main": "./dist/configurator.js",
