@@ -695,7 +695,7 @@ function constructUpdatedPackage(obj) {
   };
   const devDependenciesInclude = {
     "@types/node": "^18.14.6",
-    dxsvelte: "0.2.0-alpha.1",
+    dxsvelte: "0.2.0-alpha.2",
     esbuild: "0.18.7",
     figlet: "^1.6.0",
     inquirer: "^9.2.7",
@@ -752,7 +752,8 @@ async function installPythonDependencies() {
   console.log("Installing Python dependencies...");
   try {
     execSync2(`${getPipCommand()} install py-mini-racer`, {
-      stdio: "ignore"
+      stdio: "ignore",
+      shell: process.env.SHELL
     });
     return true;
   } catch (_) {
@@ -763,7 +764,8 @@ async function installNodeDependencies() {
   console.log("Installing Node dependencies...");
   try {
     execSync2(`npm i`, {
-      stdio: "ignore"
+      stdio: "ignore",
+      shell: process.env.SHELL
     });
     return true;
   } catch (_) {
