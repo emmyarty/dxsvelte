@@ -1,9 +1,11 @@
 node_modules
 package-lock.json
 npm-debug.log
-update-playground.js
-.pyc
 .env
+.pyc
 .DS_Store
+.vscode
 src
 meta
+debug
+local-updates.json

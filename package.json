@@ -1,34 +1,25 @@
 {
   "name": "dxsvelte",
-  "version": "0.1.4",
+  "version": "0.2.0-alpha.0",
   "description": "Bring the power of Svelte to your Django projects.",
   "homepage": "https://dxsvelte.com/",
-  "main": "dist/dxsvelte-init.js",
+  "main": "./dist/configurator.js",
+  "exports": {
+    ".": "./dist/dxsvelte.js"
+  },
   "bin": {
-    "dxsvelte": "./dist/dxsvelte-init.js"
+    "dxsvelte": "./dist/configurator.js"
   },
   "type": "module",
   "scripts": {
-    "start": "node ./dist/dxsvelte-init.js",
-    "compile": "node ./dist/dxsvelte-compiler.js",
-    "build-dist": "tsx ./src/build",
-    "build-dist-and-update-playground": "tsx ./src/build && node ./update-playground.js"
+    "config": "node ./dist/configurator.js",
+    "build": "tsx ./src/compile.ts"
   },
   "engines": {
     "node": ">=16.10.0"
   },
   "author": "emmyarty",
   "license": "MIT",
-  "dependencies": {
-    "@types/node": "^18.14.6",
-    "esbuild": "0.17.11",
-    "esbuild-plugin-inline-import": "^1.0.1",
-    "esbuild-plugin-postcss": "^0.1.4",
-    "esbuild-svelte": "^0.7.3",
-    "js-base64": "^3.7.5",
-    "svelte": "^3.56.0",
-    "svelte-preprocess": "^5.0.3"
-  },
   "keywords": [
     "svelte",
     "django",
@@ -38,5 +29,17 @@
     "client-side rendering",
     "server-side rendering",
     "esbuild"
-  ]
+  ],
+  "dependencies": {
+    "js-base64": "^3.7.5",
+    "svelte": "^4.0.0",
+    "vite": "^4.3.9",
+    "figlet": "^1.6.0",
+    "inquirer": "^9.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.14.6",
+    "@sveltejs/vite-plugin-svelte": "^2.4.2",
+    "esbuild": "^0.18.7"
+  }
 }
