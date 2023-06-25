@@ -133,7 +133,7 @@ function constructUpdatedPackage(obj: any) {
   }
   const devDependenciesInclude = {
     '@types/node': '^18.14.6',
-    dxsvelte: '0.2.0-alpha.2',
+    dxsvelte: '0.2.0-alpha.3',
     esbuild: '0.18.7',
     figlet: '^1.6.0',
     inquirer: '^9.2.7',
@@ -253,7 +253,7 @@ const operationOptionsArr = Object.keys(operationOptions).map((name) => ({
 async function main() {
   console.log(
     figlet.textSync('DxSvelte', {
-      font: 'slant',
+      font: 'Slant',
       horizontalLayout: 'default',
       verticalLayout: 'default',
       width: 80,
