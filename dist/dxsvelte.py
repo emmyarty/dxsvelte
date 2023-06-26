@@ -50,7 +50,7 @@ if exists(svelte_ssr_html_path):
     svelte_ssr_html_utf8 = open(
         svelte_ssr_html_path, "r", encoding='utf-8').read()
 else:
-    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="{{css}}"></head><body>{{app}}</body>{{spa}}<script src='{{csrjs}}' defer></script></html>"""
+    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="{{css}}"></head><body>{{app}}</body>{{spa}}<script src='{{csrjs}}' type="module" defer></script></html>"""
 
 
 # Concatenate path components and normalise the result

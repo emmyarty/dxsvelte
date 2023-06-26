@@ -91,16 +91,19 @@ encoded_output = base64.b64encode(output.encode('utf-8')).decode('utf-8')
 sys.stdout.write(f'{delimiter}{encoded_output}{delimiter}')
 sys.stdout.flush()`
 
-function extract(str) {
+function extract(str: string) {
   const delimiter = '===DXSVELTE_DELIMITER==='
   const regex = new RegExp(`${delimiter}(.*?)${delimiter}`)
   const match = str.match(regex)
+  if (typeof match === 'undefined' || match === null) {
+    throw new Error ('Router resolver Python response mangled.')
+  }
   return match[1]
 }
 
 function runPythonResolverScript(config: Config): string {
   const command = config.python ?? 'python3'
-  const { stdout, stderr, status } = spawnSync(process.env.SHELL, ['-c', command], { input: routerResolverPy, encoding: 'utf-8' })
+  const { stdout, stderr, status } = spawnSync(process.env.SHELL!, ['-c', command], { input: routerResolverPy, encoding: 'utf-8' })
   if (status === 0) {
     try {
       const encodedJsonString = extract(stdout)
@@ -198,7 +201,7 @@ function translateDjangoResolver(input: Resolver[], config: any) {
   return router
 }
 
-export function getDjangoRouter(config) {
+export function getDjangoRouter(config: Config) {
   const resolvedRouter = getRouterResolver(config)
   const translatedRouter = translateDjangoResolver(resolvedRouter, config ?? null)
   return translatedRouter

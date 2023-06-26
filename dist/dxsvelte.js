@@ -97,6 +97,9 @@ function extract(str) {
   const delimiter = "===DXSVELTE_DELIMITER===";
   const regex = new RegExp(`${delimiter}(.*?)${delimiter}`);
   const match = str.match(regex);
+  if (typeof match === "undefined" || match === null) {
+    throw new Error("Router resolver Python response mangled.");
+  }
   return match[1];
 }
 function runPythonResolverScript(config) {
@@ -241,7 +244,9 @@ function initPythonCommands() {
     const versionArr = checkPythonVersion(command);
     if (versionArr) {
       pythonCmd = versionArr[1];
-      pipCmd = pythonCmd.replace("ython", "ip");
+      if (pythonCmd) {
+        pipCmd = pythonCmd.replace("ython", "ip");
+      }
       return void 0;
     }
   }
@@ -255,7 +260,7 @@ function getPythonCommand() {
 }
 
 // src/dxsvelte.ts
-import { promises, readFileSync as readFileSync2, writeFileSync, existsSync } from "fs";
+import { promises, readFileSync as readFileSync2, writeFileSync, existsSync, mkdirSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { unlinkSync, promises as fsPromises } from "fs";
@@ -288,10 +293,10 @@ function evaluateConfig(proposed) {
   if (proposed === null) {
     proposed = {};
   }
-  config.python = proposed.python ?? getPythonCommand();
+  config.python = proposed.python ?? getPythonCommand() ?? "python3";
   config.django = proposed.django ?? `${config.python} ./manage.py runserver 0.0.0.0:8000`;
   config.baseDirectory = proposed.baseDirectory ?? resolve(process.cwd());
-  config.mainApp = proposed.mainDirectory ?? getMainAppName();
+  config.mainApp = proposed.mainApp ?? getMainAppName();
   config.views = proposed.views ?? "views";
   return config;
 }
@@ -354,11 +359,12 @@ function dxsvelte(proposed) {
   };
   return [
     {
+      name: "vite-dxsvelte",
       options(options) {
         router = getDjangoRouter(config);
         return options;
       },
-      resolveId(id, importer) {
+      resolveId(id, importer, options) {
         if (typeof id !== "string") {
           return void 0;
         }
@@ -386,6 +392,9 @@ function dxsvelte(proposed) {
         }
       },
       load(id) {
+        if (typeof id !== "string") {
+          return void 0;
+        }
         if (id.startsWith("@page?")) {
           const idQualifiedPath = splitStringAfterQuestionMark(id);
           return virtualFilePage(idQualifiedPath, router);
@@ -394,7 +403,7 @@ function dxsvelte(proposed) {
           return vfilesObj[id](router);
         }
       },
-      async writeBundle(options, bundle) {
+      async writeBundle(_, bundle) {
         const ssrBundle = Object.keys(bundle).find((key) => typeof key === "string" && key.startsWith("assets/bundle.ssr") && key.endsWith(".js"));
         if (typeof ssrBundle === "undefined") {
           return void 0;
@@ -405,7 +414,7 @@ function dxsvelte(proposed) {
         makeDirectory(outputDirectory);
         try {
           unlinkSync(outputFilePath);
-        } catch (_) {
+        } catch (_2) {
         }
         await esbuild({
           entryPoints: [inputFilePath],
@@ -415,7 +424,7 @@ function dxsvelte(proposed) {
         });
         try {
           unlinkSync(inputFilePath);
-        } catch (_) {
+        } catch (_2) {
         }
       }
     },

@@ -4,7 +4,7 @@ import { build as esbuild } from 'esbuild'
 import { getDjangoRouter } from './django'
 import { getPythonCommand } from './python'
 import { randomUUID } from 'crypto'
-import { promises, readFileSync, writeFileSync, existsSync } from 'fs'
+import { promises, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { exec as execCallback, execSync } from 'child_process'
@@ -16,12 +16,19 @@ import * as path from 'path'
 
 const { stat } = promises
 
-import type { Config, ConfigOptions, ViewComponentConfig } from '../types'
+import type { Config, ConfigOptions, Route, ViewComponentConfig } from './types'
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url))
 
 interface IVirtualFileModificationIndex {
   [key: string]: string
+}
+
+interface ResolveIdOptions {
+  assertions: Record<string, string>;
+  custom?: any | undefined;
+  ssr?: boolean | undefined;
+  isEntry: boolean;
 }
 
 const virtualFileModificationIndex: IVirtualFileModificationIndex = {}
@@ -34,16 +41,6 @@ async function getFileTimestamps(filePath: string): Promise<{ created: Date; mod
     console.error(`Error indexing modification metadata for file: ${filePath}.`)
     throw new Error(`Indexing modification failure: ${error}.`)
   }
-}
-
-// Function to generate or update the virtual file content
-function updateVirtualFileContent() {
-  // Logic to generate or update the virtual file content
-  virtualFileContent = generateVirtualFileContent()
-
-  // Notify Vite about the change to the virtual file
-  const virtualFilePath = '/virtual-file.js'
-  vite.transformCache.invalidate(virtualFilePath)
 }
 
 const baseDirectory = resolve(process.cwd())
@@ -70,14 +67,14 @@ function getMainAppName() {
 }
 
 function evaluateConfig(proposed: ConfigOptions | null) {
-  const config = {}
+  const config: ConfigOptions = {}
   if (proposed === null) {
     proposed = {}
   }
-  config.python = proposed.python ?? getPythonCommand()
+  config.python = proposed.python ?? getPythonCommand() ?? 'python3'
   config.django = proposed.django ?? `${config.python} ./manage.py runserver 0.0.0.0:8000`
   config.baseDirectory = proposed.baseDirectory ?? resolve(process.cwd())
-  config.mainApp = proposed.mainDirectory ?? getMainAppName()
+  config.mainApp = proposed.mainApp ?? getMainAppName()!
   config.views = proposed.views ?? 'views'
   return config as Config
 }
@@ -91,6 +88,7 @@ function reduceConfig(proposed: ConfigOptions | null) {
 
   dxsvelteConfigKeys.forEach((key) => {
     if (key in proposed) {
+      // @ts-expect-error
       delete proposed[key]
     }
   })
@@ -98,14 +96,14 @@ function reduceConfig(proposed: ConfigOptions | null) {
   return proposed
 }
 
-function splitStringAfterQuestionMark(str) {
+function splitStringAfterQuestionMark(str: string) {
   const index = str.indexOf('?')
   return index >= 0 ? str.slice(index + 1) : ''
 }
 
 function onDisk(path: string) {
   try {
-    return fs.existsSync(path)
+    return existsSync(path)
   } catch (_) {
     return false
   }
@@ -129,13 +127,13 @@ function relPath(importPath: string) {
   return join(moduleDirectory, importPath)
 }
 
-function virtualFileViews(router: Routes[]) {
+function virtualFileViews(router: Route[]) {
   const viewImports = router.map(({ component, filename }) => `import ${component} from "${filename}"`).join(';\n')
   const viewComponents = router.map(({ path, component }) => ({ path, component }))
   return `${viewImports}; export const viewComponents = ${JSON.stringify(viewComponents)};`
 }
 
-function virtualFileRoutesStatic(router: Routes[]) {
+function virtualFileRoutesStatic(router: Route[]) {
   return `export default ${JSON.stringify(router.map((item) => ({ path: item.path, static: item.static })))};`
 }
 
@@ -151,10 +149,10 @@ function virtualFilePage(idQualifiedPath: string, router: Route[]) {
   export default { ServerSideProps }`
 }
 
-export function dxsvelte(proposed: ConfigOptions | null): Plugin {
+export function dxsvelte(proposed: ConfigOptions | null): Plugin[] {
   const config = evaluateConfig(proposed ?? null)
   const svelteConfig = reduceConfig(proposed ?? null)
-  let router: Routes[] = []
+  let router: Route[] = []
 
   const rfilesObj = {
     '@dxsvelte:app': relPath('./core-static/app.svelte'),
@@ -166,25 +164,28 @@ export function dxsvelte(proposed: ConfigOptions | null): Plugin {
   }
 
   const vfilesObj = {
-    '@dxsvelte:routesStatic': (router: Routes[]) => `export default ${JSON.stringify(router.map((item) => ({ path: item.path, static: item.static })))};`,
-    '@dxsvelte:views': (router: Routes[]) => {
-      function makeComponentObj(path, component) {
+    '@dxsvelte:routesStatic': (router: Route[]) => `export default ${JSON.stringify(router.map((item) => ({ path: item.path, static: item.static })))};`,
+    '@dxsvelte:views': (router: Route[]) => {
+      function makeComponentObj(path: string, component: string) {
         return `{ path: "${path}", component: ${component} }`
       }
       return `${router.map(({ component, filename }) => `import ${component} from "${filename}"`).join(';\n')}; export const viewComponents = [${router
-        .map(({ path, component }) => makeComponentObj(path, component))
+        .map(({ path, component }) => makeComponentObj(path, component!))
         .join(', ')}];`
     }
   }
 
   return [
     {
-      options(options) {
+
+      name: 'vite-dxsvelte',
+
+      options(options: any) {
         router = getDjangoRouter(config)
         return options
       },
 
-      resolveId(id, importer) {
+      resolveId(id: PropertyKey, importer: string | undefined, options: ResolveIdOptions) {
         if (typeof id !== 'string') {
           return undefined
         }
@@ -199,6 +200,7 @@ export function dxsvelte(proposed: ConfigOptions | null): Plugin {
         }
 
         if (rfilesObj.hasOwnProperty(id)) {
+          // @ts-expect-error
           return rfilesObj[id]
         }
 
@@ -216,7 +218,10 @@ export function dxsvelte(proposed: ConfigOptions | null): Plugin {
         }
       },
 
-      load(id) {
+      load(id: string) {
+        if (typeof id !== 'string') {
+          return undefined
+        }
         // Generate the @page modules
         if (id.startsWith('@page?')) {
           const idQualifiedPath = splitStringAfterQuestionMark(id)
@@ -225,11 +230,12 @@ export function dxsvelte(proposed: ConfigOptions | null): Plugin {
 
         // Handle the remainder of the virtual files here
         if (vfilesObj.hasOwnProperty(id)) {
+          // @ts-expect-error
           return vfilesObj[id](router)
         }
       },
 
-      async writeBundle(options, bundle) {
+      async writeBundle(_: any, bundle: any) {
         const ssrBundle = Object.keys(bundle).find((key) => typeof key === 'string' && key.startsWith('assets/bundle.ssr') && key.endsWith('.js'))
 
         if (typeof ssrBundle === 'undefined') {
@@ -257,7 +263,7 @@ export function dxsvelte(proposed: ConfigOptions | null): Plugin {
         } catch (_) {}
       }
     },
-    svelte()
+    svelte() as unknown as Plugin
   ]
 }
 

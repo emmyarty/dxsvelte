@@ -133,7 +133,7 @@ function constructUpdatedPackage(obj: any) {
   }
   const devDependenciesInclude = {
     '@types/node': '^18.14.6',
-    dxsvelte: '0.2.0-alpha.3',
+    dxsvelte: '0.2.0-alpha.4',
     esbuild: '0.18.7',
     figlet: '^1.6.0',
     inquirer: '^9.2.7',
@@ -246,7 +246,9 @@ const operationOptions = {
 
 const operationOptionsArr = Object.keys(operationOptions).map((name) => ({
   name,
+  // @ts-expect-error
   checked: operationOptions[name].checked,
+  // @ts-expect-error
   disabled: operationOptions[name].disabled
 }))
 
@@ -282,7 +284,12 @@ async function main() {
   if (!confirmation.confirm) {
     main()
   } else {
-    await Promise.all(menu.operations.map((operation) => operationOptions[operation].action()))
+    await Promise.all(menu.operations.map((operation: string) => {
+      if (operationOptions.hasOwnProperty(operation)) {
+        // @ts-expect-error
+        return operationOptions[operation].action()
+      }
+    }))
   }
 }
 

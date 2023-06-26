@@ -5,7 +5,7 @@ import { join } from 'path'
 let pythonCmd: string|null = null
 let pipCmd: string|null = null
 
-function checkPythonVersion(command) {
+function checkPythonVersion(command: string) {
   try {
     const stdout = execSync(`${command} -V 2>/dev/null`, {
       encoding: 'utf-8',
@@ -36,7 +36,9 @@ function initPythonCommands() {
   
       if (versionArr) {
         pythonCmd = versionArr[1]
-        pipCmd = pythonCmd.replace('ython', 'ip')
+        if (pythonCmd) {
+          pipCmd = pythonCmd.replace('ython', 'ip')
+        }
         return undefined
       }
     }

@@ -10,4 +10,4 @@ interface ConfigOptions {
 
 type DxSvelteConfig = PreResolvedOptions & ConfigOptions
 
-function dxsvelte(proposed: DxSvelteConfig | null): Plugin
+export function dxsvelte(proposed: DxSvelteConfig | null): Plugin

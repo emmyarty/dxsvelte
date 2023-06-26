@@ -13,12 +13,12 @@
     "moduleResolution": "node",
     "noEmit": true,
     "baseUrl": ".",
+    "rootDir": "src"
   },
+  "exclude": ["node_modules", "dist"],
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node"
   },
-  "types": [
-    "node",
-], 
+  "types": ["node"]
 }
