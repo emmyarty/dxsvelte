@@ -684,7 +684,6 @@ async function configureTSConfig() {
     console.error(_);
     return false;
   }
-  return null;
 }
 function constructUpdatedPackage(obj) {
   const coreInclude = {
@@ -697,12 +696,12 @@ function constructUpdatedPackage(obj) {
   };
   const devDependenciesInclude = {
     "@types/node": "^18.14.6",
-    dxsvelte: "0.2.0-alpha.7",
+    dxsvelte: "0.2.0-alpha.8",
     esbuild: "0.18.7",
     figlet: "^1.6.0",
     inquirer: "^9.2.7",
     "js-base64": "^3.7.5",
-    svelte: "^4.0.0",
+    svelte: "^3.59.2",
     vite: "^4.3.9"
   };
   const dependenciesInclude = {};

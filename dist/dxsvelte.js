@@ -344,9 +344,9 @@ function dxsvelte(proposed) {
     "@dxsvelte:app": relPath("./core-static/app.svelte"),
     "@dxsvelte:layout": relPath("./core-static/layout.svelte"),
     "@dxsvelte:router": relPath("./core-static/router.ts"),
-    "@dxsvelte:common": relPath("./core-static/common.ts"),
     "@dxsvelte:csr": relPath("./core-static/entrypoint-csr.js"),
-    "@dxsvelte:ssr": relPath("./core-static/entrypoint-ssr.js")
+    "@dxsvelte:ssr": relPath("./core-static/entrypoint-ssr.js"),
+    "@common": relPath("./core-static/common.ts")
   };
   const vfilesObj = {
     "@dxsvelte:routesStatic": (router2) => `export default ${JSON.stringify(router2.map((item) => ({ path: item.path, static: item.static })))};`,
