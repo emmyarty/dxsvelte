@@ -1,6 +1,6 @@
 {
   "name": "dxsvelte",
-  "version": "0.2.0-alpha.6",
+  "version": "0.2.0-alpha.7",
   "description": "Bring the power of Svelte to your Django projects.",
   "homepage": "https://dxsvelte.com/",
   "main": "./dist/configurator.js",
@@ -31,6 +31,7 @@
     "esbuild"
   ],
   "dependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "figlet": "^1.6.0",
     "inquirer": "^9.2.7",
     "js-base64": "^3.7.5",
@@ -38,7 +39,6 @@
     "vite": "^4.3.9"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.4.2",
     "@types/figlet": "^1.5.6",
     "@types/inquirer": "^9.0.3",
     "@types/node": "^18.14.6",
