@@ -4,7 +4,7 @@ import figlet from 'figlet'
 import { execSync } from 'child_process'
 import { basename, join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { statSync, readFileSync, copyFileSync, writeFileSync } from 'fs'
+import { statSync, readFileSync, copyFileSync, writeFileSync, appendFileSync } from 'fs'
 import { getPythonCommand, getPipCommand, getMainAppName } from './python'
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url))
@@ -133,7 +133,7 @@ function constructUpdatedPackage(obj: any) {
   }
   const devDependenciesInclude = {
     '@types/node': '^18.14.6',
-    dxsvelte: '0.2.0-alpha.4',
+    dxsvelte: '0.2.0-alpha.5',
     esbuild: '0.18.7',
     figlet: '^1.6.0',
     inquirer: '^9.2.7',
@@ -165,11 +165,28 @@ async function configurePackage() {
   }
 }
 
+function injectFile(filePath: string, inject: string, create: boolean = false): void {
+  if (checkFileExists(filePath)) {
+    const data = readFileSync(filePath, 'utf8')
+    if (!data.includes(inject)) {
+      appendFileSync(filePath, `\n${inject}`)
+    }
+  } else {
+    if (create) {
+      appendFileSync(filePath, inject)
+    } else {
+      console.error(`Could not install config to: ${basename(filePath)}.`)
+    }
+  }
+}
+
 async function installPythonScript() {
   try {
     console.log('Installing Python Script...')
-    const fpath = getFullPath('dxsvelte.py')
-    copyFileSync(join(moduleDirectory, 'dxsvelte.py'), fpath)
+    const envFilePath = getFullPath('.env')
+    const settingFilePath = getFullPath(join(getMainAppName()!, 'settings.py'))
+    injectFile(envFilePath, `PYTHONPATH="node_modules/dxsvelte/dist"`, true)
+    injectFile(settingFilePath, `import sys;sys.path.insert(0, 'node_modules/dxsvelte/dist')`, false)
     return true
   } catch (_) {
     return false
@@ -284,12 +301,14 @@ async function main() {
   if (!confirmation.confirm) {
     main()
   } else {
-    await Promise.all(menu.operations.map((operation: string) => {
-      if (operationOptions.hasOwnProperty(operation)) {
-        // @ts-expect-error
-        return operationOptions[operation].action()
-      }
-    }))
+    await Promise.all(
+      menu.operations.map((operation: string) => {
+        if (operationOptions.hasOwnProperty(operation)) {
+          // @ts-expect-error
+          return operationOptions[operation].action()
+        }
+      })
+    )
   }
 }
 

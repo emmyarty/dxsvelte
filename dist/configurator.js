@@ -498,7 +498,7 @@ import figlet from "figlet";
 import { execSync as execSync2 } from "child_process";
 import { basename, join as join2, dirname } from "path";
 import { fileURLToPath } from "url";
-import { statSync, readFileSync as readFileSync2, copyFileSync, writeFileSync } from "fs";
+import { statSync, readFileSync as readFileSync2, copyFileSync, writeFileSync, appendFileSync } from "fs";
 
 // src/python.ts
 import { execSync } from "child_process";
@@ -697,7 +697,7 @@ function constructUpdatedPackage(obj) {
   };
   const devDependenciesInclude = {
     "@types/node": "^18.14.6",
-    dxsvelte: "0.2.0-alpha.4",
+    dxsvelte: "0.2.0-alpha.5",
     esbuild: "0.18.7",
     figlet: "^1.6.0",
     inquirer: "^9.2.7",
@@ -730,11 +730,28 @@ async function configurePackage() {
     return false;
   }
 }
+function injectFile(filePath, inject, create = false) {
+  if (checkFileExists(filePath)) {
+    const data = readFileSync2(filePath, "utf8");
+    if (!data.includes(inject)) {
+      appendFileSync(filePath, `
+${inject}`);
+    }
+  } else {
+    if (create) {
+      appendFileSync(filePath, inject);
+    } else {
+      console.error(`Could not install config to: ${basename(filePath)}.`);
+    }
+  }
+}
 async function installPythonScript() {
   try {
     console.log("Installing Python Script...");
-    const fpath = getFullPath("dxsvelte.py");
-    copyFileSync(join2(moduleDirectory, "dxsvelte.py"), fpath);
+    const envFilePath = getFullPath(".env");
+    const settingFilePath = getFullPath(join2(getMainAppName(), "settings.py"));
+    injectFile(envFilePath, `PYTHONPATH="node_modules/dxsvelte/dist"`, true);
+    injectFile(settingFilePath, `import sys;sys.path.insert(0, 'node_modules/dxsvelte/dist')`, false);
     return true;
   } catch (_) {
     return false;
@@ -843,11 +860,13 @@ async function main() {
   if (!confirmation.confirm) {
     main();
   } else {
-    await Promise.all(menu.operations.map((operation) => {
-      if (operationOptions.hasOwnProperty(operation)) {
-        return operationOptions[operation].action();
-      }
-    }));
+    await Promise.all(
+      menu.operations.map((operation) => {
+        if (operationOptions.hasOwnProperty(operation)) {
+          return operationOptions[operation].action();
+        }
+      })
+    );
   }
 }
 function checkIsDjangoProject() {
