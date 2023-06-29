@@ -1,10 +1,6 @@
-import { defineConfig } from 'vite'
-import { dxsvelte, defineBuild } from 'dxsvelte'
+import { dxsvelte } from 'dxsvelte'
 
 // vite.config.js
-export default defineConfig({
-  plugins: [
-    dxsvelte()
-  ],
-  build: defineBuild()
+export default dxsvelte({
+  // Customise your Vite configuration here.
 })

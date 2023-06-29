@@ -37,20 +37,31 @@ def find_matching_file(directory, prefix, extension):
 
 
 # Load the Svelte SSR JavaScript file, or set to an erroneous default if it doesn't exist
-svelte_ssr_js_path = join(settings.BASE_DIR, project, "bundle.ssr.js")
+svelte_ssr_js_path = join(settings.BASE_DIR, project, "app/entrypoint-ssr.js")
 if exists(svelte_ssr_js_path):
     svelte_ssr_js_utf8 = open(svelte_ssr_js_path, "r", encoding='utf-8').read()
 else:
-    svelte_ssr_js_utf8 = "result = { html: \"404\" };"
+    svelte_ssr_js_utf8 = "result = { html: \"500\" };"
 
 
 # Load the Svelte SSR HTML file, or set to a default value if it doesn't exist
-svelte_ssr_html_path = join(settings.BASE_DIR, "static", "index.html")
+svelte_ssr_html_path = join(settings.BASE_DIR, project, "index.html")
 if exists(svelte_ssr_html_path):
     svelte_ssr_html_utf8 = open(
         svelte_ssr_html_path, "r", encoding='utf-8').read()
 else:
     svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="{{css}}"></head><body>{{app}}</body>{{spa}}<script src='{{csrjs}}' type="module" defer></script></html>"""
+
+
+# Initialise Svelte asset imports
+csrjs = "/static/app/assets/" + \
+    find_matching_file(join(settings.BASE_DIR, "static",
+                        "app", "assets"), "bundle.csr", "js")
+css = "/static/app/assets/" + \
+    find_matching_file(join(settings.BASE_DIR, "static",
+                        "app", "assets"), "entrypoint", "css")
+svelte_ssr_html_utf8 = svelte_ssr_html_utf8.replace("{{csrjs}}", csrjs, -1)
+svelte_ssr_html_utf8 = svelte_ssr_html_utf8.replace("{{css}}", css, -1)
 
 
 # Concatenate path components and normalise the result
@@ -67,16 +78,8 @@ def abs_path(*paths):
 
 # Wrap the Svelte SSR markup with the template container
 def svelte_ssr_html_wrap(app):
-    csrjs = "/static/bundles/assets/" + \
-        find_matching_file(join(settings.BASE_DIR, "static",
-                           "bundles", "assets"), "bundle.csr", "js")
-    css = "/static/bundles/assets/" + \
-        find_matching_file(join(settings.BASE_DIR, "static",
-                           "bundles", "assets"), "app", "css")
     html = svelte_ssr_html_utf8
-    html = html.replace("{{csrjs}}", csrjs, -1)
     html = html.replace("{{app}}", app, -1)
-    html = html.replace("{{css}}", css, -1)
     return html
 
 
@@ -94,15 +97,13 @@ def _urlencode(input):
 # Process the render request given a path and payload
 def _render(SSRPATH, csrf_token, data={}):
     # TODO: RETURN SSR
-    return ""
     ctx = MiniRacer()
     json_data = json.dumps(data)
     SSRJSON = _urlencode(json_data)
     SSRCSRF = _urlencode(csrf_token)
     set_consts = f"const SSRPATH='{SSRPATH}'; const SSRJSON='{SSRJSON}'; const SSRCSRF='{SSRCSRF}';"
     ctx.eval(set_consts)
-    ctx.eval(svelte_ssr_js_utf8)
-    resultString = ctx.eval("result")
+    resultString = ctx.eval(svelte_ssr_js_utf8)
     resultJson = json.loads(resultString)
     result = resultJson["html"]
     return result

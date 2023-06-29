@@ -691,12 +691,14 @@ function constructUpdatedPackage(obj) {
     type: "module"
   };
   const scriptsInclude = {
-    dev: "vite",
-    build: "vite build"
+    build: "npm run build:csr && npm run build:ssr",
+    "build:csr": "vite build",
+    "build:ssr": "vite build --ssr",
+    conf: "dxsvelte"
   };
   const devDependenciesInclude = {
     "@types/node": "^18.14.6",
-    dxsvelte: "0.2.0-alpha.8",
+    dxsvelte: "0.2.0-alpha.9",
     esbuild: "0.18.7",
     figlet: "^1.6.0",
     inquirer: "^9.2.7",

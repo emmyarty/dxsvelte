@@ -107,10 +107,6 @@ additionalTargets.forEach((target) => {
   console.log(`Carrying across to: ${target}`)
   deleteDirectorySync(target)
   recursiveCopyDirectorySync('.', target)
-  // Monkey patch ESBuild's permissions on the copy target.
-  try {
-    execSync(`chmod +x "${join(target, 'node_modules/@esbuild/darwin-x64/bin/esbuild')}"`)
-  } catch (_) {}
 })
 
 console.log('Build succeeded; exiting.')

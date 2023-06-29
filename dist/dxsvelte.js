@@ -1,6 +1,5 @@
 // src/dxsvelte.ts
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { build as esbuild } from "esbuild";
 
 // src/django.ts
 import { spawnSync } from "child_process";
@@ -263,10 +262,18 @@ function getPythonCommand() {
 import { promises, readFileSync as readFileSync2, writeFileSync, existsSync, mkdirSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-import { unlinkSync, promises as fsPromises } from "fs";
+import { promises as fsPromises } from "fs";
 import { join as join3 } from "path";
 import * as path from "path";
 var { stat } = promises;
+function packageJsonImport() {
+  try {
+    return JSON.parse(readFileSync2("./package.json", "utf-8"));
+  } catch (err) {
+    console.error(err);
+    throw new Error("Unable to import package.json.");
+  }
+}
 var moduleDirectory = dirname(fileURLToPath(import.meta.url));
 var baseDirectory = resolve(process.cwd());
 var mainAppName = null;
@@ -316,12 +323,6 @@ function splitStringAfterQuestionMark(str) {
   const index = str.indexOf("?");
   return index >= 0 ? str.slice(index + 1) : "";
 }
-function makeDirectory(dest) {
-  try {
-    mkdirSync(dest, { recursive: true });
-  } catch (_) {
-  }
-}
 function relPath(importPath) {
   return join3(moduleDirectory, importPath);
 }
@@ -336,7 +337,7 @@ function virtualFilePage(idQualifiedPath, router) {
   export const ServerSideProps = core.serverDataStore[route].data
   export default { ServerSideProps }`;
 }
-function dxsvelte(proposed) {
+function dxsvelteVitePlugin(proposed) {
   const config = evaluateConfig(proposed ?? null);
   const svelteConfig = reduceConfig(proposed ?? null);
   let router = [];
@@ -402,61 +403,72 @@ function dxsvelte(proposed) {
         if (vfilesObj.hasOwnProperty(id)) {
           return vfilesObj[id](router);
         }
-      },
-      async writeBundle(_, bundle) {
-        const ssrBundle = Object.keys(bundle).find((key) => typeof key === "string" && key.startsWith("assets/bundle.ssr") && key.endsWith(".js"));
-        if (typeof ssrBundle === "undefined") {
-          return void 0;
-        }
-        const outputDirectory = join3(process.cwd(), `./${getMainAppName()}`);
-        const outputFilePath = join3(outputDirectory, "bundle.ssr.js");
-        const inputFilePath = join3(process.cwd(), "static", "bundles", ssrBundle);
-        makeDirectory(outputDirectory);
-        try {
-          unlinkSync(outputFilePath);
-        } catch (_2) {
-        }
-        await esbuild({
-          entryPoints: [inputFilePath],
-          bundle: true,
-          format: "esm",
-          outfile: outputFilePath
-        });
-        try {
-          unlinkSync(inputFilePath);
-        } catch (_2) {
-        }
       }
     },
     svelte()
   ];
 }
-function defineBuild(options) {
+function dxsvelte(options) {
   const isBuild = process.argv.includes("build");
-  if (typeof options === "undefined" || options === null) {
+  const ssr = process.argv.includes("--ssr");
+  const csr = !ssr;
+  if (typeof options === "undefined" || options === null)
     options = {};
+  if (typeof options.build === "undefined" || options.build === null)
+    options.build = {};
+  if (typeof options.build.rollupOptions === "undefined" || options.build.rollupOptions === null)
+    options.build.rollupOptions = {};
+  if (typeof options.plugins === "undefined" || options.plugins === null || Array.isArray(options.plugins) && options.plugins.length === 0) {
+    options.plugins = [dxsvelteVitePlugin()];
   }
-  if (typeof options.ssrParent !== "string") {
-    options.ssrParent = `./${getMainAppName()}`;
+  if (isBuild && ssr) {
+    options.build.minify = options.build.minify ?? false;
+    if (typeof options.ssr !== "object" || !options.ssr)
+      options.ssr = {};
+    const pkg = packageJsonImport();
+    if (!options.build.rollupOptions.output) {
+      options.build.rollupOptions.output = {};
+    }
+    if (!options.build.rollupOptions.output.dir || typeof options.build.rollupOptions.output.dir !== "string") {
+      options.build.rollupOptions.output.dir = `./${getMainAppName()}/app`;
+    }
+    if (typeof options.build.rollupOptions.input !== "string") {
+      options.build.rollupOptions.input = "@dxsvelte:ssr";
+    }
+    const ssrOptions = {
+      target: "node",
+      noExternal: Object.keys({
+        ...options.ssr.noExternal ?? {},
+        ...pkg.dependencies ?? {},
+        ...pkg.devDependencies ?? {}
+      }),
+      entry: "@dxsvelte:ssr"
+    };
+    options.ssr = {
+      ...ssrOptions,
+      ...options.ssr
+    };
   }
-  if (typeof options.rollupOptions === "undefined" || options.rollupOptions === null) {
-    options.rollupOptions = {};
+  if (isBuild && csr) {
+    options.build.minify = typeof options.build.minify === "boolean" ? options.build.minify : true;
+    if (!options.build.rollupOptions.input || typeof options.build.rollupOptions.input !== "object") {
+      options.build.rollupOptions.input = { "bundle.csr": "@dxsvelte:csr" };
+    }
+    if (!options.build.rollupOptions.output || typeof options.build.rollupOptions.output !== "object") {
+      options.build.rollupOptions.output = { dir: `./static/app` };
+    }
   }
-  if (isBuild && !options.rollupOptions.output) {
-    options.rollupOptions.output = {};
-    options.rollupOptions.output.dir = "./static/bundles";
-  }
-  if (isBuild && !options.rollupOptions.input) {
-    options.rollupOptions.input = {};
-    options.rollupOptions.input["bundle.csr"] = "@dxsvelte:csr";
-    options.rollupOptions.input["bundle.ssr"] = "@dxsvelte:ssr";
+  if (!isBuild && csr) {
+    if (!options.build.rollupOptions.input || typeof options.build.rollupOptions.input !== "object") {
+      options.build.rollupOptions.input = "@dxsvelte:csr";
+    }
   }
   return options;
 }
-var dxsvelte_default = { dxsvelte, defineBuild };
+var dxsvelte_default = { dxsvelteVitePlugin, dxsvelte };
 export {
   dxsvelte_default as default,
-  defineBuild,
-  dxsvelte
+  dxsvelte,
+  dxsvelteVitePlugin
 };
 //# sourceMappingURL=dxsvelte.js.map
