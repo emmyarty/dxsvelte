@@ -3,18 +3,9 @@ import { execSync, spawnSync } from 'child_process'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
-function posixSlash(str: string | null) {
-  if (!str) return str
-  return str.replace(/\\/g, '/')
-}
-
-const moduleDirectory = dirname(fileURLToPath(import.meta.url))
-const dxsvelteImportString = `import sys;sys.path.insert(0, '${posixSlash(moduleDirectory)}')`
-
 const routerResolverPy = String.raw`#!/usr/bin/python3
 import os
 import sys
-${dxsvelteImportString}
 import django
 from django.urls import get_resolver, URLPattern, URLResolver
 from django.urls.resolvers import RoutePattern
@@ -138,6 +129,11 @@ function getRouterResolver(config: Config) {
     console.error(err)
     throw new Error('Could Not Load Django Router Object')
   }
+}
+
+function posixSlash(str: string | null) {
+  if (!str) return str
+  return str.replace(/\\/g, '/')
 }
 
 function formatSvelteComponentFilepath(parent: string, str: string, config: any) {

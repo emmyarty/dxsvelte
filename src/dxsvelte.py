@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.urls import resolve
 from os.path import join, exists
-from os import listdir
+from os import listdir, makedirs
 import json
 from py_mini_racer import MiniRacer
 from django.middleware.csrf import get_token
@@ -54,12 +54,12 @@ else:
 
 
 # Initialise Svelte asset imports
-csrjs = "/static/app/assets/" + \
-    find_matching_file(join(settings.BASE_DIR, "static",
-                        "app", "assets"), "bundle.csr", "js")
-css = "/static/app/assets/" + \
-    find_matching_file(join(settings.BASE_DIR, "static",
-                        "app", "assets"), "entrypoint", "css")
+csrjs_directory = join(settings.BASE_DIR, "static", "app", "assets")
+css_directory = join(settings.BASE_DIR, "static", "app", "assets")
+makedirs(csrjs_directory, exist_ok=True)
+makedirs(css_directory, exist_ok=True)
+csrjs = "/static/app/assets/" + find_matching_file(csrjs_directory, "bundle.csr", "js")
+css = "/static/app/assets/" + find_matching_file(css_directory, "entrypoint", "css")
 svelte_ssr_html_utf8 = svelte_ssr_html_utf8.replace("{{csrjs}}", csrjs, -1)
 svelte_ssr_html_utf8 = svelte_ssr_html_utf8.replace("{{css}}", css, -1)
 

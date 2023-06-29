@@ -3,19 +3,10 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 // src/django.ts
 import { spawnSync } from "child_process";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
-function posixSlash(str) {
-  if (!str)
-    return str;
-  return str.replace(/\\/g, "/");
-}
-var moduleDirectory = dirname(fileURLToPath(import.meta.url));
-var dxsvelteImportString = `import sys;sys.path.insert(0, '${posixSlash(moduleDirectory)}')`;
+import { join } from "path";
 var routerResolverPy = String.raw`#!/usr/bin/python3
 import os
 import sys
-${dxsvelteImportString}
 import django
 from django.urls import get_resolver, URLPattern, URLResolver
 from django.urls.resolvers import RoutePattern
@@ -136,6 +127,11 @@ function getRouterResolver(config) {
     console.error(err);
     throw new Error("Could Not Load Django Router Object");
   }
+}
+function posixSlash(str) {
+  if (!str)
+    return str;
+  return str.replace(/\\/g, "/");
 }
 function formatSvelteComponentFilepath(parent, str, config) {
   if (str.length < 2) {
@@ -265,7 +261,7 @@ function getPythonCommand() {
 // src/dxsvelte.ts
 import { promises, readFileSync as readFileSync2, writeFileSync, existsSync, mkdirSync } from "fs";
 import { dirname as dirname2, resolve } from "path";
-import { fileURLToPath as fileURLToPath2 } from "url";
+import { fileURLToPath } from "url";
 import { promises as fsPromises } from "fs";
 import { join as join3 } from "path";
 import * as path from "path";
@@ -278,7 +274,7 @@ function packageJsonImport() {
     throw new Error("Unable to import package.json.");
   }
 }
-var moduleDirectory2 = dirname2(fileURLToPath2(import.meta.url));
+var moduleDirectory = dirname2(fileURLToPath(import.meta.url));
 var baseDirectory = resolve(process.cwd());
 var mainAppName = null;
 function initMainAppName() {
@@ -328,7 +324,7 @@ function splitStringAfterQuestionMark(str) {
   return index >= 0 ? str.slice(index + 1) : "";
 }
 function relPath(importPath) {
-  return join3(moduleDirectory2, importPath);
+  return join3(moduleDirectory, importPath);
 }
 function virtualFilePage(idQualifiedPath, router) {
   const route = router.find((item) => item.filename === idQualifiedPath);
