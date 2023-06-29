@@ -16,25 +16,6 @@ import * as path from 'path'
 
 const { stat } = promises
 
-interface PackageJson {
-  devDependencies?: {
-    [key: string]: string;
-  };
-  dependencies?: {
-    [key: string]: string;
-  };
-}
-
-
-function packageJsonImport(): PackageJson {
-  try {
-    return JSON.parse(readFileSync('./package.json', 'utf-8'));
-  } catch (err) {
-    console.error(err);
-    throw new Error('Unable to import package.json.')
-  }
-}
-
 import type { Config, ConfigOptions, Route, ViewComponentConfig } from './types'
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url))
@@ -277,8 +258,6 @@ export function dxsvelte(options: any | null | undefined): ConfigOptions {
 
     if (typeof options.ssr !== 'object' || !options.ssr) options.ssr = {}
 
-    const pkg = packageJsonImport()
-
     if (!options.build.rollupOptions.output) {
       options.build.rollupOptions.output = {}
     }
@@ -293,11 +272,7 @@ export function dxsvelte(options: any | null | undefined): ConfigOptions {
 
     const ssrOptions = {
       target: 'node',
-      noExternal: Object.keys({
-        ...options.ssr.noExternal ?? {},
-        ...pkg.dependencies ?? {},
-        ...pkg.devDependencies ?? {}
-      }),
+      noExternal: true,
       entry: '@dxsvelte:ssr',
     }
 

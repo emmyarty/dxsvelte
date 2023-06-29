@@ -266,14 +266,6 @@ import { promises as fsPromises } from "fs";
 import { join as join3 } from "path";
 import * as path from "path";
 var { stat } = promises;
-function packageJsonImport() {
-  try {
-    return JSON.parse(readFileSync2("./package.json", "utf-8"));
-  } catch (err) {
-    console.error(err);
-    throw new Error("Unable to import package.json.");
-  }
-}
 var moduleDirectory = dirname2(fileURLToPath(import.meta.url));
 var baseDirectory = resolve(process.cwd());
 var mainAppName = null;
@@ -425,7 +417,6 @@ function dxsvelte(options) {
     options.build.minify = options.build.minify ?? false;
     if (typeof options.ssr !== "object" || !options.ssr)
       options.ssr = {};
-    const pkg = packageJsonImport();
     if (!options.build.rollupOptions.output) {
       options.build.rollupOptions.output = {};
     }
@@ -437,11 +428,7 @@ function dxsvelte(options) {
     }
     const ssrOptions = {
       target: "node",
-      noExternal: Object.keys({
-        ...options.ssr.noExternal ?? {},
-        ...pkg.dependencies ?? {},
-        ...pkg.devDependencies ?? {}
-      }),
+      noExternal: true,
       entry: "@dxsvelte:ssr"
     };
     options.ssr = {
