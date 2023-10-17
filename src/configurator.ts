@@ -11,6 +11,9 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url))
 
 const maindir = process.cwd()
 
+//@ts-expect-error
+const isBun = typeof !!(Bun !== "undefined")
+
 let debug: boolean = false
 
 try {
@@ -127,7 +130,7 @@ function constructUpdatedPackage(obj: any) {
     type: 'module'
   }
   const scriptsInclude = {
-    build: 'npm run build:csr && npm run build:ssr',
+    build: `${isBun?'bun':'npm'} run build:csr && ${isBun?'bun':'npm'} run build:ssr`,
     'build:csr': 'vite build',
     'build:ssr': 'vite build --ssr',
     conf: 'dxsvelte'
@@ -220,7 +223,7 @@ async function installPythonDependencies() {
 async function installNodeDependencies() {
   console.log('Installing Node dependencies...')
   try {
-    execSync(`npm i`, {
+    execSync(`${isBun?'bun':'npm'} i`, {
       stdio: 'ignore',
       shell: process.env.SHELL
     })
@@ -255,7 +258,7 @@ const operationOptions = {
     disabled: false,
     action: installPythonDependencies
   },
-  'NPM Install Node dependencies': {
+  [`${isBun?'Bun':'NPM'} Install${isBun?' ':' Node '}dependencies`]: {
     checked: false,
     disabled: false,
     action: installNodeDependencies
@@ -264,9 +267,7 @@ const operationOptions = {
 
 const operationOptionsArr = Object.keys(operationOptions).map((name) => ({
   name,
-  // @ts-expect-error
   checked: operationOptions[name].checked,
-  // @ts-expect-error
   disabled: operationOptions[name].disabled
 }))
 
@@ -305,7 +306,6 @@ async function main() {
     await Promise.all(
       menu.operations.map((operation: string) => {
         if (operationOptions.hasOwnProperty(operation)) {
-          // @ts-expect-error
           return operationOptions[operation].action()
         }
       })
