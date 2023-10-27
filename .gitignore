@@ -7,3 +7,6 @@ debug
 .env
 .DS_Store
 .vscode
+.whl
+.tar.gz
+pypi

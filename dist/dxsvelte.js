@@ -427,7 +427,7 @@ function dxsvelte(options) {
       options.build.rollupOptions.input = "@dxsvelte:ssr";
     }
     const ssrOptions = {
-      target: "node",
+      target: "webworker",
       noExternal: true,
       entry: "@dxsvelte:ssr"
     };

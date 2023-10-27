@@ -271,7 +271,7 @@ export function dxsvelte(options: any | null | undefined): ConfigOptions {
     }
 
     const ssrOptions = {
-      target: 'node',
+      target: 'webworker',
       noExternal: true,
       entry: '@dxsvelte:ssr',
     }

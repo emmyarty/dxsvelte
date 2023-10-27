@@ -186,7 +186,7 @@ function injectFile(filePath: string, inject: string, create: boolean = false): 
 
 async function installPythonScript() {
   try {
-    console.log('Installing Python Script...')
+    console.log('Installing Python Script in /node_modules ...')
     const envFilePath = getFullPath('.env')
     const settingFilePath = getFullPath(join(getMainAppName()!, 'settings.py'))
     injectFile(envFilePath, `PYTHONPATH="node_modules/dxsvelte/dist"`, true)
@@ -211,7 +211,7 @@ async function configureVite() {
 async function installPythonDependencies() {
   console.log('Installing Python dependencies...')
   try {
-    execSync(`${getPipCommand()} install py-mini-racer`, {
+    execSync(`${getPipCommand()} install dxsvelte`, {
       stdio: 'ignore',
       shell: process.env.SHELL
     })
@@ -248,20 +248,20 @@ const operationOptions = {
     disabled: false,
     action: configureVite
   },
-  'Install Python Script': {
+  'PIP Install Python Dependencies': {
     checked: true,
-    disabled: false,
-    action: installPythonScript
-  },
-  'PIP Install Python V8 Dependency': {
-    checked: false,
     disabled: false,
     action: installPythonDependencies
   },
   [`${isBun?'Bun':'NPM'} Install${isBun?' ':' Node '}dependencies`]: {
-    checked: false,
+    checked: true,
     disabled: false,
     action: installNodeDependencies
+  },
+  'Use DxSvelte Script in /node_modules (Deprecated)': {
+    checked: false,
+    disabled: false,
+    action: installPythonScript
   }
 }
 

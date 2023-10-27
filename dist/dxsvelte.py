@@ -3,11 +3,17 @@ import base64
 from django.http import HttpResponse
 from django.conf import settings
 from django.urls import resolve
-from os.path import join, exists
+from warnings import warn
+from os.path import join, exists, dirname, basename, abspath
 from os import listdir, makedirs
 import json
 from py_mini_racer import MiniRacer
 from django.middleware.csrf import get_token
+
+
+# Throw a warning if the package is being imported from node_modules
+if basename(dirname(dirname(abspath(__file__)))) == "dist":
+    warn("DxSvelte is currently being imported from node_modules. This is not recommended for production use.\nPlease install the Python package for use in production.")
 
 
 # Add @static_view decorator - this adds an attribute to the view which is used by the
@@ -50,7 +56,7 @@ if exists(svelte_ssr_html_path):
     svelte_ssr_html_utf8 = open(
         svelte_ssr_html_path, "r", encoding='utf-8').read()
 else:
-    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="{{css}}"></head><body>{{app}}</body>{{spa}}<script src='{{csrjs}}' type="module" defer></script></html>"""
+    svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="{{css}}"></head><body>{{app}}</body><script src='{{csrjs}}' type="module" defer></script></html>"""
 
 
 # Initialise Svelte asset imports

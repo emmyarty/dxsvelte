@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+packages = ["src/dxsvelte"]
+directory = "./pypi"
+ignore-vcs = true
+
+[project]
+name = "dxsvelte"
+version = "0.2.0a18"
+authors = [{ name = "emmyarty" }]
+description = "Bring the power of Svelte to your Django projects."
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+dependencies = ["py-mini-racer>=0.6.0"]
+
+[project.urls]
+"Homepage" = "https://dxsvelte.com/"
+"Bug Tracker" = "https://github.com/emmyarty/dxsvelte/issues"
