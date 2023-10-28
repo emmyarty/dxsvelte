@@ -16,7 +16,7 @@
 
 DxSvelte is a powerful integration package that brings Svelte to your Django web applications with a simplified workflow, closer to how you would normally Render views. Enjoy the full benefit of SSR in your next single-page application (SPA).
 
-## 🎉 Changelog (Release 0.2.0-alpha.18)
+## 🎉 Changelog (Release 0.2.0-alpha.19)
 - Project fully ported across to Vite, and can now leverage many of the awesome tools available to the SvelteKit ecosystem!
 - Svelte version migrated from 3.x.x -> 4.2.2 following Vite port of DxSvelte.
 - Published the Python package element of the project to PyPi.
@@ -24,6 +24,7 @@ DxSvelte is a powerful integration package that brings Svelte to your Django web
 - Exposed ``goto(path)`` as a ``@common`` import function.
 - Added CSRF tokens and a form object builder to handle its attachment.
 - Experimental Bun support.
+- Implemented sourcemapped SSR errors with CSR failover.
 - Other miscellaneous clean-ups.
 
 ## 🔎 To-Do List & Known Bugs
@@ -49,7 +50,7 @@ The new documentation is now available to read. And it was built with DxSvelte!
 To get started with DxSvelte, ``cd`` into your Django project and initialise DxSvelte so it's ready to start building your SPA:
 
 ```sh
-npx dxsvelte
+npx dxsvelte@alpha
 ```
 Follow the wizard and you should now have a directory tree resembling the following:
 

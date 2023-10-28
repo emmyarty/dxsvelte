@@ -1,15 +1,18 @@
 # Import necessary libraries
-import base64
+from py_mini_racer import MiniRacer
+from py_mini_racer.py_mini_racer import JSEvalException
+from django.middleware.csrf import get_token
 from django.http import HttpResponse
 from django.conf import settings
 from django.urls import resolve
 from warnings import warn
-from os.path import join, exists, dirname, basename, abspath
+from os.path import join, exists, dirname, basename, abspath, relpath
 from os import listdir, makedirs
+from sys import stderr
+import sourcemap
+import base64
 import json
-from py_mini_racer import MiniRacer
-from django.middleware.csrf import get_token
-
+import re
 
 # Throw a warning if the package is being imported from node_modules
 if basename(dirname(dirname(abspath(__file__)))) == "dist":
@@ -45,8 +48,11 @@ def find_matching_file(directory, prefix, extension):
 # Load the Svelte SSR JavaScript file, or set to an erroneous default if it doesn't exist
 svelte_ssr_js_path = join(settings.BASE_DIR, project, "app/entrypoint-ssr.js")
 if exists(svelte_ssr_js_path):
+    svelte_ssr_js_map_path = join(
+        settings.BASE_DIR, project, "app/entrypoint-ssr.js.map")
     svelte_ssr_js_utf8 = open(svelte_ssr_js_path, "r", encoding='utf-8').read()
 else:
+    svelte_ssr_js_map_path = None
     svelte_ssr_js_utf8 = "result = { html: \"500\" };"
 
 
@@ -58,26 +64,72 @@ if exists(svelte_ssr_html_path):
 else:
     svelte_ssr_html_utf8 = """<!doctype html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta name="viewport" content="width=device-width" /><title>Django App</title><link rel="stylesheet" href="{{css}}"></head><body>{{app}}</body><script src='{{csrjs}}' type="module" defer></script></html>"""
 
-
 # Initialise Svelte asset imports
 csr_directory = join(settings.BASE_DIR, "static", "app", "assets")
 makedirs(csr_directory, exist_ok=True)
-csrjs = "/static/app/assets/" + find_matching_file(csr_directory, "bundle.csr", "js")
-css = "/static/app/assets/" + find_matching_file(csr_directory, "entrypoint", "css")
+csrjs = "/static/app/assets/" + \
+    find_matching_file(csr_directory, "bundle.csr", "js")
+css = "/static/app/assets/" + \
+    find_matching_file(csr_directory, "entrypoint", "css")
 svelte_ssr_html_utf8 = svelte_ssr_html_utf8.replace("{{csrjs}}", csrjs, -1)
 svelte_ssr_html_utf8 = svelte_ssr_html_utf8.replace("{{css}}", css, -1)
 
 
-# Concatenate path components and normalise the result
-def abs_path(*paths):
-    joined_path = '/'.join(paths)
-    cleaned_path = joined_path.replace('//', '/')
-    if cleaned_path.startswith('/'):
-        final_path = cleaned_path
-    else:
-        final_path = '/' + cleaned_path
-    final_path = final_path.rstrip('/')
-    return final_path
+# Initialise the sourcemap and error parsing
+def generate_error_map(source_map_path):
+    with open(abspath(source_map_path), 'r') as sourcemap_file:
+        imported_sourcemap = sourcemap.load(sourcemap_file)
+        tokensDict = {}
+        for t in list(imported_sourcemap):
+            key = str(t.dst_line) + "_" + str(t.dst_col)
+            tokensDict[key] = {
+                "src": relpath(abspath(join(svelte_ssr_js_map_path, '..', t.src))),
+                "src_line": t.src_line + 1,
+                "src_col": t.src_col + 1,
+                "name": "<anonymous>" if t.name is None else t.name,
+            }
+
+    def error_map(line, column):
+        key = str(line-1) + "_" + str(column-1)
+        if key in tokensDict:
+            return tokensDict[key]
+        return None
+    return error_map
+
+
+error_map = generate_error_map(
+    svelte_ssr_js_map_path) if svelte_ssr_js_map_path is not None else None
+
+
+# Print the error trace with the assistance of the sourcemap
+def _print_js_error(e):
+    def red(text): return f"\033[31m{text}\033[0m"
+    def yellow(text): return f"\033[33m{text}\033[0m"
+    error_message = str(e.args).split('\\n')
+    if error_map is None:
+        return
+    mapped_error_trace = []
+    for index, line in enumerate(error_message):
+        if index == 0:
+            mapped_error_trace.append(
+                f"{red('::  ')}{yellow('JavaScript SSR Error')}")
+        elif index == 1:
+            mapped_error_trace.append(f"{red('::  ')}{yellow(line)}")
+        else:
+            line = line.strip()
+            split_lines = line.split(':')
+            split_lines = [re.sub('[^0-9]', '', item) for item in split_lines]
+            lookup_line = int(split_lines[-2])
+            lookup_column = int(split_lines[-1])
+            mapped_error = error_map(lookup_line, lookup_column)
+            if mapped_error is not None:
+                mapped_error = f"{red('::')}    at {mapped_error['name']} @ {mapped_error['src']}:{mapped_error['src_line']}:{mapped_error['src_col']}"
+                mapped_error_trace.append(mapped_error)
+    if len(error_message) < 3:
+        mapped_error_trace.append('Unable to map the error trace.')
+        f"{red('::')}    <unable to map the error trace>"
+    for line in mapped_error_trace:
+        print(line, file=stderr)
 
 
 # Wrap the Svelte SSR markup with the template container
@@ -92,6 +144,8 @@ def _normalise_url(url):
     url = url.strip("/")
     url = "/" + url.lstrip("/")
     return url
+
+
 def _urlencode(input):
     encoded_input = base64.b64encode(input.encode('utf-8')).decode('utf-8')
     encoded_input_urlsafe = encoded_input.replace('+', '-').replace('/', '_')
@@ -107,10 +161,15 @@ def _render(SSRPATH, csrf_token, data={}):
     SSRCSRF = _urlencode(csrf_token)
     set_consts = f"const SSRPATH='{SSRPATH}'; const SSRJSON='{SSRJSON}'; const SSRCSRF='{SSRCSRF}';"
     ctx.eval(set_consts)
-    resultString = ctx.eval(svelte_ssr_js_utf8)
-    resultJson = json.loads(resultString)
-    result = resultJson["html"]
-    return result
+    try:
+        resultString = ctx.eval(svelte_ssr_js_utf8)
+        resultJson = json.loads(resultString)
+        result = resultJson["html"]
+        return result
+    # If SSR fails, we will log an error but return an empty string so that the CSR can take over
+    except JSEvalException as e:
+        _print_js_error(e)
+        return ""
 
 
 # Define gets and posts more tidily in the views.py, will likely be removed in future

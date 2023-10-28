@@ -9,7 +9,7 @@ ignore-vcs = true
 
 [project]
 name = "dxsvelte"
-version = "0.2.0a18"
+version = "0.2.0a19"
 authors = [{ name = "emmyarty" }]
 description = "Bring the power of Svelte to your Django projects."
 readme = "README.md"
@@ -20,7 +20,7 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 
-dependencies = ["py-mini-racer>=0.6.0"]
+dependencies = ["py-mini-racer>=0.6.0", "sourcemap>=0.2.1"]
 
 [project.urls]
 "Homepage" = "https://dxsvelte.com/"

@@ -281,6 +281,8 @@ export function dxsvelte(options: any | null | undefined): ConfigOptions {
       ...options.ssr
     }
 
+    options.build.sourcemap = true
+
   }
 
   if (isBuild && csr) {

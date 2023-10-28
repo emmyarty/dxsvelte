@@ -576,7 +576,7 @@ function getMainAppName() {
 // src/configurator.ts
 var moduleDirectory = dirname(fileURLToPath(import.meta.url));
 var maindir = process.cwd();
-var isBun = typeof !!(Bun !== "undefined");
+var isBun = typeof Bun !== "undefined";
 var debug = false;
 try {
   const args = process.argv.slice(2);
@@ -699,13 +699,13 @@ function constructUpdatedPackage(obj) {
   };
   const devDependenciesInclude = {
     "@types/node": "^18.14.6",
-    dxsvelte: "0.2.0-alpha.14",
+    dxsvelte: "0.2.0-alpha.18",
     esbuild: "0.18.7",
     figlet: "^1.6.0",
     inquirer: "^9.2.7",
     "js-base64": "^3.7.5",
-    svelte: "^3.59.2",
-    vite: "^4.3.9"
+    svelte: "^4.2.2",
+    vite: "^4.5.0"
   };
   const dependenciesInclude = {};
   obj = { ...obj, ...coreInclude };

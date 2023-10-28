@@ -12,7 +12,7 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url))
 const maindir = process.cwd()
 
 //@ts-expect-error
-const isBun = typeof !!(Bun !== "undefined")
+const isBun = typeof Bun !== "undefined"
 
 let debug: boolean = false
 
@@ -137,13 +137,13 @@ function constructUpdatedPackage(obj: any) {
   }
   const devDependenciesInclude = {
     '@types/node': '^18.14.6',
-    dxsvelte: '0.2.0-alpha.14',
+    dxsvelte: '0.2.0-alpha.18',
     esbuild: '0.18.7',
     figlet: '^1.6.0',
     inquirer: '^9.2.7',
     'js-base64': '^3.7.5',
-    svelte: '^3.59.2',
-    vite: '^4.3.9'
+    svelte: '^4.2.2',
+    vite: '^4.5.0'
   }
   const dependenciesInclude = {}
   obj = { ...obj, ...coreInclude }

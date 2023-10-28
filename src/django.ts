@@ -1,5 +1,6 @@
 import type { Config, Pattern, Resolver, Route, RouteObject } from './types'
 import { execSync, spawnSync } from 'child_process'
+import { writeFileSync } from 'fs'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -205,5 +206,6 @@ function translateDjangoResolver(input: Resolver[], config: any) {
 export function getDjangoRouter(config: Config) {
   const resolvedRouter = getRouterResolver(config)
   const translatedRouter = translateDjangoResolver(resolvedRouter, config ?? null)
+  writeFileSync('./dump.json', JSON.stringify(translatedRouter, null, 2), 'utf-8')
   return translatedRouter
 }
