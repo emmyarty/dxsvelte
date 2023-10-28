@@ -137,7 +137,7 @@ function constructUpdatedPackage(obj: any) {
   }
   const devDependenciesInclude = {
     '@types/node': '^18.14.6',
-    dxsvelte: '0.2.0-alpha.18',
+    dxsvelte: '0.2.0-alpha.20',
     esbuild: '0.18.7',
     figlet: '^1.6.0',
     inquirer: '^9.2.7',

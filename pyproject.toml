@@ -9,7 +9,7 @@ ignore-vcs = true
 
 [project]
 name = "dxsvelte"
-version = "0.2.0a19"
+version = "0.2.0a20"
 authors = [{ name = "emmyarty" }]
 description = "Bring the power of Svelte to your Django projects."
 readme = "README.md"

@@ -151,6 +151,14 @@ def _urlencode(input):
     encoded_input_urlsafe = encoded_input.replace('+', '-').replace('/', '_')
     return encoded_input_urlsafe
 
+def _csr_failover(SSRPATH, SSRJSON, SSRCSRF):
+    if SSRPATH is None or SSRPATH == "":
+        SSRPATH = "/"
+    return f"""<script>
+    function decode(payload) {{ const base64JsonString = payload.replace(/-/g, '+').replace(/_/g, '/');const padding = base64JsonString.length % 4;const paddedBase64String = padding ? base64JsonString + '='.repeat(4 - padding) : base64JsonString;const jsonString = atob(paddedBase64String, 'base64');return jsonString }}
+    function unwrap(payload) {{ const jsonString = decode(payload); try {{ return JSON.parse(jsonString); }} catch (err) {{ console.error(err); return {{}} }} }}
+    const payload = "{SSRJSON}"; window.initialDataPayload = {{ route: "{SSRPATH}", data: unwrap(payload) }}; window["X-CSRFToken"] = decode("{SSRCSRF}")
+    </script>"""
 
 # Process the render request given a path and payload
 def _render(SSRPATH, csrf_token, data={}):
@@ -169,7 +177,7 @@ def _render(SSRPATH, csrf_token, data={}):
     # If SSR fails, we will log an error but return an empty string so that the CSR can take over
     except JSEvalException as e:
         _print_js_error(e)
-        return ""
+        return _csr_failover(SSRPATH, SSRJSON, SSRCSRF)
 
 
 # Define gets and posts more tidily in the views.py, will likely be removed in future
