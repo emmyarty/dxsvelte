@@ -2,8 +2,9 @@
 // It ensures that objects being imported are 'localised' as appropriate.
 
 //@ts-ignore
-import { activeViewStore, onlyPath } from `@dxsvelte:router`
+import { activeViewStore, onlyPath, goto } from `@dxsvelte:router`
 import { Writable, writable } from "svelte/store";
+
 
 const viewStore = activeViewStore as Writable<{ route: string, href: string }>
 
@@ -53,4 +54,8 @@ export function FormSetup (endpoint: string, callback: Callback = async (data: a
     }
 }
 
-export default { ViewState, getCsrfTokenHeader, FormSetup }
+export function gotoClient(url: string): Promise<undefined> {
+    return goto(url)()
+}
+
+export default { ViewState, getCsrfTokenHeader, FormSetup, goto: gotoClient }

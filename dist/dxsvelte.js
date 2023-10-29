@@ -3,6 +3,7 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 
 // src/django.ts
 import { spawnSync } from "child_process";
+import { writeFileSync } from "fs";
 import { join } from "path";
 var routerResolverPy = String.raw`#!/usr/bin/python3
 import os
@@ -202,6 +203,7 @@ function translateDjangoResolver(input, config) {
 function getDjangoRouter(config) {
   const resolvedRouter = getRouterResolver(config);
   const translatedRouter = translateDjangoResolver(resolvedRouter, config ?? null);
+  writeFileSync("./dump.json", JSON.stringify(translatedRouter, null, 2), "utf-8");
   return translatedRouter;
 }
 
@@ -259,7 +261,7 @@ function getPythonCommand() {
 }
 
 // src/dxsvelte.ts
-import { promises, readFileSync as readFileSync2, writeFileSync, existsSync, mkdirSync } from "fs";
+import { promises, readFileSync as readFileSync2, writeFileSync as writeFileSync2, existsSync, mkdirSync } from "fs";
 import { dirname as dirname2, resolve } from "path";
 import { fileURLToPath } from "url";
 import { promises as fsPromises } from "fs";
@@ -427,7 +429,7 @@ function dxsvelte(options) {
       options.build.rollupOptions.input = "@dxsvelte:ssr";
     }
     const ssrOptions = {
-      target: "node",
+      target: "webworker",
       noExternal: true,
       entry: "@dxsvelte:ssr"
     };
@@ -435,6 +437,7 @@ function dxsvelte(options) {
       ...ssrOptions,
       ...options.ssr
     };
+    options.build.sourcemap = true;
   }
   if (isBuild && csr) {
     options.build.minify = typeof options.build.minify === "boolean" ? options.build.minify : true;

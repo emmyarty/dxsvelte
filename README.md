@@ -12,19 +12,34 @@
 
 ## 💌 Introduction
 >**Warning**:
->This project is in early Alpha and key features are still under active development.
+>This project is in Alpha and key features are still under active development.
 
 DxSvelte is a powerful integration package that brings Svelte to your Django web applications with a simplified workflow, closer to how you would normally Render views. Enjoy the full benefit of SSR in your next single-page application (SPA).
+
+## 🎉 Changelog (Release 0.2.0-alpha.20)
+- Project fully ported across to Vite, and can now leverage many of the awesome tools available to the SvelteKit ecosystem!
+- Svelte version migrated from 3.x.x -> 4.2.2 following Vite port of DxSvelte.
+- Published the Python package element of the project to PyPi.
+- Improved type hints and in-line function documentation through JSDoc.
+- Exposed ``goto(path)`` as a ``@common`` import function.
+- Added CSRF tokens and a form object builder to handle its attachment.
+- Experimental Bun support.
+- Implemented sourcemapped SSR errors with CSR failover.
+- Other miscellaneous clean-ups.
+
+## 🔎 To-Do List & Known Bugs
+- **404 Errors:** TBC.
+- **Type Generation (Autocomplete):** Decision TBC.
 
 ## 📔 Documentation
 The new documentation is now available to read. And it was built with DxSvelte!
 
 [![Documentation](https://img.shields.io/badge/Read%20It-Here-orange?&style=for-the-badge)](https://dxsvelte.com/)
 
-## Features
+## ⚡️ Features
 - **Seamless Integration:** DxSvelte integrates tightly with Django's route resolvers, allowing you to easily build SPAs with Svelte without manually connecting the dots through DRF (though you don't lose that functionality, should you need it). The whole philosophy here is that SPA functionality can and should be a 'first class citizen' in Django.
 - **Automatic SPA Generation:** You don't have to manually configure REST endpoints or manage complex API interactions. Instead, DxSvelte automatically generates the SPA for you, based on the routes defined in your Django app.
-- **Easy Server-Side Props:** When rendering a view, you may pass a dictionary as the second argument and access it via the **$data** object in your Svelte template file.
+- **Easy Server-Side Props:** When rendering a view, you may pass a dictionary as the second argument and access it via the ``$ServerSideProps`` object in your Svelte template file.
 - **Server Side Rendering (SSR):** DxSvelte uses Svelte's efficient rendering engine to deliver fast and responsive user experiences, without sacrificing the power and flexibility of Django. But not only that, DxSvelte also takes care of SSR (Server Side Rendering), so that the first page-load is already rendered when it arrives in the browser.
 - **Fast Compilation:** DxSvelte uses ESBuild (a powerful JS compiler written in Rust) under the hood to give you the best possible compile times.
 - **Incremental Adoption:** The default behaviour when it comes to navigation makes it easy to adopt the SPA incrementally. If you have an existing project you don't want to rewrite or only want for a specific portion of the site to be an SPA, then just keep going as you are; the SPA will honour any **\<a href=..\/>** tags which lead away from the SPA by checking itself against the automatically generated routing table.
@@ -32,13 +47,12 @@ The new documentation is now available to read. And it was built with DxSvelte!
 ------------------------------
 
 ## Getting Started
-To get started with DxSvelte, initialise your Django project so it's ready to start building your SPA:
+To get started with DxSvelte, ``cd`` into your Django project and initialise DxSvelte so it's ready to start building your SPA:
 
 ```sh
-npx dxsvelte
-npm i
+npx dxsvelte@alpha
 ```
-You should now have a directory tree resembling the following:
+Follow the wizard and you should now have a directory tree resembling the following:
 
 ```
 my_project_name
@@ -113,6 +127,7 @@ That's it! Now you can start building your Svelte-powered hybrid SSR SPA, all wh
 You can now pass your server-side props as a Dict from your Django view directly to Svelte, while still taking full advantage of SSR. Usage is simple, but be sure to validate your objects on the front-end before accessing them. The data argument is optional and can be omitted if you have no server-side properties to pass.
 
 ```py
+# urls.py
 urlpatterns = [
     path('', views.index, name='$index'),
     path('about/<str:company>/', views.about, name='$about'),
@@ -120,6 +135,9 @@ urlpatterns = [
 ```
 
 ```py
+# views.py
+import render from dxsvelte
+
 def about(req, company):
     data = {
         "aboutUsText": "Lorem ipsum dolor sit amet, consectetur adip...",
@@ -151,15 +169,14 @@ Meanwhile, in your **about.svelte** component over in the ./views directory:
 
 ------------------------------
 
-## To-Do List & Known Bugs
-- **404 Errors:** Will be added in the near future.
-- **Page Title Updates:** Will be added in the near future.
-- **CSS Generation:** PostCSS support for Tailwind etc.
-- **Type Generation (Autocomplete):** Decision TBC
-
-
 ## Contributing
 We welcome contributions to DxSvelte! If you'd like to contribute, please open an issue or pull request on our [GitHub repository](https://github.com/emmyarty/dxsvelte).
 
 ## License
 DxSvelte is released under the [MIT License](https://opensource.org/licenses/MIT/).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -10,3 +10,6 @@ src
 meta
 debug
 local-updates.json
+.whl
+.tar.gz
+pypi

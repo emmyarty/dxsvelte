@@ -3,7 +3,11 @@ package-lock.json
 npm-debug.log
 local-updates.json
 debug
+dist
 .pyc
 .env
 .DS_Store
 .vscode
+.whl
+.tar.gz
+pypi

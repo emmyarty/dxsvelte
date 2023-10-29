@@ -11,6 +11,9 @@ const moduleDirectory = dirname(fileURLToPath(import.meta.url))
 
 const maindir = process.cwd()
 
+//@ts-expect-error
+const isBun = typeof Bun !== "undefined"
+
 let debug: boolean = false
 
 try {
@@ -127,20 +130,20 @@ function constructUpdatedPackage(obj: any) {
     type: 'module'
   }
   const scriptsInclude = {
-    build: 'npm run build:csr && npm run build:ssr',
+    build: `${isBun?'bun':'npm'} run build:csr && ${isBun?'bun':'npm'} run build:ssr`,
     'build:csr': 'vite build',
     'build:ssr': 'vite build --ssr',
     conf: 'dxsvelte'
   }
   const devDependenciesInclude = {
     '@types/node': '^18.14.6',
-    dxsvelte: '0.2.0-alpha.14',
+    dxsvelte: '0.2.0-alpha.20',
     esbuild: '0.18.7',
     figlet: '^1.6.0',
     inquirer: '^9.2.7',
     'js-base64': '^3.7.5',
-    svelte: '^3.59.2',
-    vite: '^4.3.9'
+    svelte: '^4.2.2',
+    vite: '^4.5.0'
   }
   const dependenciesInclude = {}
   obj = { ...obj, ...coreInclude }
@@ -183,7 +186,7 @@ function injectFile(filePath: string, inject: string, create: boolean = false): 
 
 async function installPythonScript() {
   try {
-    console.log('Installing Python Script...')
+    console.log('Installing Python Script in /node_modules ...')
     const envFilePath = getFullPath('.env')
     const settingFilePath = getFullPath(join(getMainAppName()!, 'settings.py'))
     injectFile(envFilePath, `PYTHONPATH="node_modules/dxsvelte/dist"`, true)
@@ -208,7 +211,7 @@ async function configureVite() {
 async function installPythonDependencies() {
   console.log('Installing Python dependencies...')
   try {
-    execSync(`${getPipCommand()} install py-mini-racer`, {
+    execSync(`${getPipCommand()} install dxsvelte`, {
       stdio: 'ignore',
       shell: process.env.SHELL
     })
@@ -220,7 +223,7 @@ async function installPythonDependencies() {
 async function installNodeDependencies() {
   console.log('Installing Node dependencies...')
   try {
-    execSync(`npm i`, {
+    execSync(`${isBun?'bun':'npm'} i`, {
       stdio: 'ignore',
       shell: process.env.SHELL
     })
@@ -245,28 +248,26 @@ const operationOptions = {
     disabled: false,
     action: configureVite
   },
-  'Install Python Script': {
+  'PIP Install Python Dependencies': {
     checked: true,
-    disabled: false,
-    action: installPythonScript
-  },
-  'PIP Install Python V8 Dependency': {
-    checked: false,
     disabled: false,
     action: installPythonDependencies
   },
-  'NPM Install Node dependencies': {
-    checked: false,
+  [`${isBun?'Bun':'NPM'} Install${isBun?' ':' Node '}dependencies`]: {
+    checked: true,
     disabled: false,
     action: installNodeDependencies
+  },
+  'Use DxSvelte Script in /node_modules (Deprecated)': {
+    checked: false,
+    disabled: false,
+    action: installPythonScript
   }
 }
 
 const operationOptionsArr = Object.keys(operationOptions).map((name) => ({
   name,
-  // @ts-expect-error
   checked: operationOptions[name].checked,
-  // @ts-expect-error
   disabled: operationOptions[name].disabled
 }))
 
@@ -305,7 +306,6 @@ async function main() {
     await Promise.all(
       menu.operations.map((operation: string) => {
         if (operationOptions.hasOwnProperty(operation)) {
-          // @ts-expect-error
           return operationOptions[operation].action()
         }
       })
