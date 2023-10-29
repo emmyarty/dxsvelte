@@ -86,17 +86,24 @@ class ServerDataStore {
       }`;
       const loc = `${protocol}//${hostnameQualified}${validatedTarget}/`;
       // Note: CSRF?
-      const reqOptions = {
+      const reqOptions: RequestInit = {
         method: "GET",
+        redirect: "manual", // <- Prevent the browser from following the redirect
         headers: { "Content-Type": "application/json", "X-DXS-METHOD": "GET" },
         // headers: { "Content-Type": "application/json" },
       };
       const resultRaw = await fetch(loc, reqOptions);
+      // console.log("DXS GET Result: ", resultRaw);
+      if (resultRaw.type == 'opaqueredirect'){ // <- Catch and handle regular Django's redirect
+        console.log("Redirectig to: ", target);
+        return location.href = target ? target : "";
+      }
       const resultJson = await resultRaw.json();
       this.data.set(resultJson);
-    // console.info("DXS GET Result: ", resultJson);
     } catch (err) {
-      console.error("Server Request Failed - Contact Site Administrator.");
+      console.error("Server Request Failed - Contact Site Administrator.", err);
+      return location.href = target  ? target: "";// <- Catch and handle errors
+      
     }
   }
   satisfiedBy(urlPath: string) {
