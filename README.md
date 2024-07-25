@@ -136,7 +136,7 @@ urlpatterns = [
 
 ```py
 # views.py
-import render from dxsvelte
+from dxsvelte import render
 
 def about(req, company):
     data = {
